@@ -20,7 +20,7 @@ Vue.js 不支持 IE8 及其以下版本，因为 Vue.js 使用了 IE8 不能模�
 
 Vue.js 提供一个官方命令行工具 `vue-cli`
 
-```commonlisp
+```shell
 # 全局安装 vue-cli
 $ npm install --global vue-cli
 # 创建一个基于 webpack 模板的新项目

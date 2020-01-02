@@ -1,6 +1,6 @@
 # TensorFlow2.x
 
-## 1、分类
+## 01、分类
 
 ### Import
 
@@ -88,7 +88,7 @@ plot_learning_curves(history)
 
 
 
-## 2、回归
+## 02、回归
 
 ### Model
 
@@ -270,7 +270,7 @@ model.evaluate(x_test_scaled, y_test)
 
 ![image-20191231052116047](J:\03_NOTES\ML\TensorFlow2.x.assets\image-20191231052116047.png)
 
-## 3、基础API
+## 03、基础API
 
 ### 常量
 
@@ -560,6 +560,757 @@ callbacks = [keras.callbacks.EarlyStopping(
 
 > `%time` 	  可以测量一行代码执行的时间
 > `%timeit` 	可以测量一行代码多次执行的时间
+
+```python
+# tf.function and auto-graph.
+def scaled_elu(z, scale=1.0, alpha=1.0):
+    # z >= 0 ? scale * z : scale * alpha * tf.nn.elu(z)
+    is_positive = tf.greater_equal(z, 0.0)
+    return scale * tf.where(is_positive, z, alpha * tf.nn.elu(z))
+
+print(scaled_elu(tf.constant(-3.)))
+print(scaled_elu(tf.constant([-3., -2.5])))
+
+scaled_elu_tf = tf.function(scaled_elu)
+print(scaled_elu_tf(tf.constant(-3.)))
+print(scaled_elu_tf(tf.constant([-3., -2.5])))
+
+print(scaled_elu_tf.python_function is scaled_elu)
+
+%timeit scaled_elu(tf.random.normal((1000, 1000)))
+%timeit scaled_elu_tf(tf.random.normal((1000, 1000)))
+
+@tf.function
+def converge_to_2(n_iters):
+    total = tf.constant(0.)
+    increment = tf.constant(1.)
+    for _ in range(n_iters):
+        total += increment
+        increment /= 2.0
+    return total
+
+print(converge_to_2(20))
+```
+
+```python
+def display_tf_code(func):
+    code = tf.autograph.to_code(func)
+    from IPython.display import display, Markdown
+    display(Markdown('```python\n{}\n```'.format(code)))
+    
+display_tf_code(scaled_elu)
+```
+
+```python
+var = tf.Variable(0.)
+
+@tf.function
+def add_21():
+    return var.assign_add(21) # += 
+
+print(add_21())
+
+@tf.function(input_signature=[tf.TensorSpec([None], tf.int32, name='x')])
+def cube(z):
+    return tf.pow(z, 3)
+
+try:
+    print(cube(tf.constant([1., 2., 3.])))
+except ValueError as ex:
+    print(ex)
+    
+print(cube(tf.constant([1, 2, 3])))
+
+
+```
+
+```python
+@tf.function(input_signature=[tf.TensorSpec([None], tf.int32, name='x')]) #类型限制(可以不加)
+def cube(z):
+    return tf.pow(z, 3)
+
+try:
+    print(cube(tf.constant([1., 2., 3.])))
+except ValueError as ex:
+    print(ex)
+    
+print(cube(tf.constant([1, 2, 3])))
+```
+
+```python
+# @tf.function py func -> tf graph
+# get_concrete_function -> add input signature -> SavedModel
+
+cube_func_int32 = cube.get_concrete_function(
+    tf.TensorSpec([None], tf.int32))
+print(cube_func_int32)
+print(cube_func_int32 is cube.get_concrete_function(tf.TensorSpec([5], tf.int32)))
+print(cube_func_int32 is cube.get_concrete_function(tf.constant([1, 2, 3])))
+
+cube_func_int32.graph
+cube_func_int32.graph.get_operations()
+
+[<tf.Operation 'x' type=Placeholder>,
+ <tf.Operation 'Pow/y' type=Const>,
+ <tf.Operation 'Pow' type=Pow>,
+ <tf.Operation 'Identity' type=Identity>]
+
+pow_op = cube_func_int32.graph.get_operations()[2]
+print(pow_op)
+
+name: "Pow"
+op: "Pow"
+input: "x"
+input: "Pow/y"
+attr {
+  key: "T"
+  value {
+    type: DT_INT32
+  }
+}
+
+print(list(pow_op.inputs))
+print(list(pow_op.outputs))
+cube_func_int32.graph.get_operation_by_name("x")
+cube_func_int32.graph.get_tensor_by_name("x:0")
+cube_func_int32.graph.as_graph_def()
+```
+
+### 自定义求导
+
+```python
+def f(x):
+    return 3. * x ** 2 + 2. * x - 1
+
+def approximate_derivative(f, x, eps=1e-3):
+    return (f(x + eps) - f(x - eps)) / (2. * eps)
+
+print(approximate_derivative(f, 1.))
+
+7.999999999999119
+
+def g(x1, x2):
+    return (x1 + 5) * (x2 ** 2)
+
+def approximate_gradient(g, x1, x2, eps=1e-3):
+    dg_x1 = approximate_derivative(lambda x: g(x, x2), x1, eps)
+    dg_x2 = approximate_derivative(lambda x: g(x1, x), x2, eps)
+    return dg_x1, dg_x2
+
+print(approximate_gradient(g, 2., 3.))
+
+(8.999999999993236, 41.999999999994486)
+```
+
+```python
+x1 = tf.Variable(2.0)
+x2 = tf.Variable(3.0)
+with tf.GradientTape() as tape:
+    z = g(x1, x2)
+
+dz_x1 = tape.gradient(z, x1)
+print(dz_x1)
+
+try:
+    dz_x2 = tape.gradient(z, x2)
+except RuntimeError as ex:
+    print(ex)
+    
+tf.Tensor(9.0, shape=(), dtype=float32)
+GradientTape.gradient can only be called once on non-persistent tapes.
+```
+
+```python
+x1 = tf.Variable(2.0)
+x2 = tf.Variable(3.0)
+with tf.GradientTape(persistent = True) as tape:
+    z = g(x1, x2)
+
+dz_x1 = tape.gradient(z, x1)
+dz_x2 = tape.gradient(z, x2)
+print(dz_x1, dz_x2)
+
+del tape
+
+tf.Tensor(9.0, shape=(), dtype=float32) tf.Tensor(42.0, shape=(), dtype=float32)
+```
+
+```python
+# 变量求导
+x1 = tf.Variable(2.0)
+x2 = tf.Variable(3.0)
+with tf.GradientTape() as tape:
+    z = g(x1, x2)
+
+dz_x1x2 = tape.gradient(z, [x1, x2])
+
+print(dz_x1x2)
+
+[<tf.Tensor: id=95, shape=(), dtype=float32, numpy=9.0>, <tf.Tensor: id=101, shape=(), dtype=float32, numpy=42.0>]
+
+#常量求导
+x1 = tf.constant(2.0)
+x2 = tf.constant(3.0)
+with tf.GradientTape() as tape:
+    z = g(x1, x2)
+
+dz_x1x2 = tape.gradient(z, [x1, x2])
+
+print(dz_x1x2)
+
+[None, None]
+```
+
+```python
+# 常量求导
+x1 = tf.constant(2.0)
+x2 = tf.constant(3.0)
+with tf.GradientTape() as tape:
+    tape.watch(x1)
+    tape.watch(x2)
+    z = g(x1, x2)
+
+dz_x1x2 = tape.gradient(z, [x1, x2])
+
+print(dz_x1x2)
+[<tf.Tensor: id=192, shape=(), dtype=float32, numpy=9.0>, <tf.Tensor: id=204, shape=(), dtype=float32, numpy=42.0>]
+```
+
+```python
+# 多函数求导
+x = tf.Variable(5.0)
+with tf.GradientTape() as tape:
+    z1 = 3 * x
+    z2 = x ** 2
+tape.gradient([z1, z2], x)
+
+<tf.Tensor: id=261, shape=(), dtype=float32, numpy=13.0>
+```
+
+```python
+# 二阶导数
+x1 = tf.Variable(2.0)
+x2 = tf.Variable(3.0)
+with tf.GradientTape(persistent=True) as outer_tape:
+    with tf.GradientTape(persistent=True) as inner_tape:
+        z = g(x1, x2)
+    inner_grads = inner_tape.gradient(z, [x1, x2])
+outer_grads = [outer_tape.gradient(inner_grad, [x1, x2]) for inner_grad in inner_grads]
+print(outer_grads)
+del inner_tape
+del outer_tape
+
+[[None, <tf.Tensor: id=324, shape=(), dtype=float32, numpy=6.0>], [<tf.Tensor: id=378, shape=(), dtype=float32, numpy=6.0>, <tf.Tensor: id=361, shape=(), dtype=float32, numpy=14.0>]]
+```
+
+```python
+# 梯度下降
+learning_rate = 0.1
+x = tf.Variable(0.0)
+
+for _ in range(100):
+    with tf.GradientTape() as tape:
+        z = f(x)
+    dz_dx = tape.gradient(z, x)
+    x.assign_sub(learning_rate * dz_dx)
+print(x)
+
+<tf.Variable 'Variable:0' shape=() dtype=float32, numpy=-0.3333333>
+```
+
+```python
+# optimizer
+learning_rate = 0.1
+x = tf.Variable(0.0)
+
+optimizer = keras.optimizers.SGD(lr = learning_rate)
+
+for _ in range(100):
+    with tf.GradientTape() as tape:
+        z = f(x)
+    dz_dx = tape.gradient(z, x)
+    optimizer.apply_gradients([(dz_dx, x)])
+print(x)
+
+<tf.Variable 'Variable:0' shape=() dtype=float32, numpy=-0.3333333>
+```
+
+### 自定义求导与tf.keras实例
+
+#### Import
+
+```python
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+%matplotlib inline
+import numpy as np
+import sklearn
+import pandas as pd
+import os
+import sys
+import time
+import tensorflow as tf
+
+from tensorflow import keras
+```
+
+#### 数据集
+
+```python
+from sklearn.datasets import fetch_california_housing
+
+housing = fetch_california_housing()
+print(housing.DESCR)
+print(housing.data.shape)
+print(housing.target.shape)
+
+from sklearn.model_selection import train_test_split
+
+x_train_all, x_test, y_train_all, y_test = train_test_split(
+    housing.data, housing.target, random_state = 7)
+x_train, x_valid, y_train, y_valid = train_test_split(
+    x_train_all, y_train_all, random_state = 11)
+print(x_train.shape, y_train.shape)
+print(x_valid.shape, y_valid.shape)
+print(x_test.shape, y_test.shape)
+```
+
+#### 归一化
+
+```python
+from sklearn.preprocessing import StandardScaler
+
+scaler = StandardScaler()
+x_train_scaled = scaler.fit_transform(x_train)
+x_valid_scaled = scaler.transform(x_valid)
+x_test_scaled = scaler.transform(x_test)
+```
+
+#### metric使用
+
+```python
+# metric使用
+metric = keras.metrics.MeanSquaredError()
+print(metric([5.], [2.]))
+print(metric([0.], [1.])) # 自动累加
+print(metric.result())
+
+metric.reset_states() # 重置
+metric([1.], [3.])
+print(metric.result())
+```
+
+#### 手动遍历求导
+
+```python
+# 1. batch 遍历训练集 metric
+#    1.1 自动求导
+# 2. epoch结束 验证集 metric
+
+epochs = 100
+batch_size = 32
+steps_per_epoch = len(x_train_scaled) // batch_size
+optimizer = keras.optimizers.SGD()
+metric = keras.metrics.MeanSquaredError()
+
+def random_batch(x, y, batch_size=32):
+    idx = np.random.randint(0, len(x), size=batch_size)
+    return x[idx], y[idx]
+
+model = keras.models.Sequential([
+    keras.layers.Dense(30, activation='relu',
+                       input_shape=x_train.shape[1:]),
+    keras.layers.Dense(1),
+])
+
+for epoch in range(epochs):
+    metric.reset_states()
+    for step in range(steps_per_epoch):
+        x_batch, y_batch = random_batch(x_train_scaled, y_train,
+                                        batch_size)
+        with tf.GradientTape() as tape:
+            y_pred = model(x_batch)
+            loss = tf.reduce_mean(
+                keras.losses.mean_squared_error(y_batch, y_pred))
+            metric(y_batch, y_pred)
+        grads = tape.gradient(loss, model.variables)
+        grads_and_vars = zip(grads, model.variables)
+        optimizer.apply_gradients(grads_and_vars)
+        print("\rEpoch", epoch, " train mse:",
+              metric.result().numpy(), end="")
+    y_valid_pred = model(x_valid_scaled)
+    valid_loss = tf.reduce_mean(
+        keras.losses.mean_squared_error(y_valid_pred, y_valid))
+    print("\t", "valid mse: ", valid_loss.numpy())
+```
+
+
+
+## 04、tf.data
+
+### 基础API
+
+```python
+dataset = tf.data.Dataset.from_tensor_slices(np.arange(10))
+print(dataset)
+
+# 遍历
+for item in dataset:
+    print(item)
+
+# 1. repeat epoch
+# 2. get batch
+dataset = dataset.repeat(3).batch(7)
+for item in dataset:
+    print(item)
+    
+tf.Tensor([0 1 2 3 4 5 6], shape=(7,), dtype=int64)
+tf.Tensor([7 8 9 0 1 2 3], shape=(7,), dtype=int64)
+tf.Tensor([4 5 6 7 8 9 0], shape=(7,), dtype=int64)
+tf.Tensor([1 2 3 4 5 6 7], shape=(7,), dtype=int64)
+tf.Tensor([8 9], shape=(2,), dtype=int64)
+
+# interleave: 
+# case: 文件dataset -> 具体数据集
+dataset2 = dataset.interleave(
+    lambda v: tf.data.Dataset.from_tensor_slices(v), # map_fn
+    cycle_length = 5, # cycle_length 并行
+    block_length = 5, # block_length 块大小
+)
+for item in dataset2:
+    print(item)
+```
+
+```python
+x = np.array([[1, 2], [3, 4], [5, 6]])
+y = np.array(['cat', 'dog', 'fox'])
+dataset3 = tf.data.Dataset.from_tensor_slices((x, y))
+print(dataset3)
+
+for item_x, item_y in dataset3:
+    print(item_x.numpy(), item_y.numpy())
+
+<TensorSliceDataset shapes: ((2,), ()), types: (tf.int64, tf.string)>
+[1 2] b'cat'
+[3 4] b'dog'
+[5 6] b'fox'
+```
+
+```python
+dataset4 = tf.data.Dataset.from_tensor_slices({"feature": x,
+                                               "label": y})
+for item in dataset4:
+    print(item["feature"].numpy(), item["label"].numpy())
+
+[1 2] b'cat'
+[3 4] b'dog'
+[5 6] b'fox'
+```
+
+### CSV
+
+```python
+def get_dataset(file_path):
+  dataset = tf.data.experimental.make_csv_dataset(
+      file_path,
+      batch_size=12, # 为了示例更容易展示，手动设置较小的值
+      label_name=LABEL_COLUMN,
+      na_value="?",
+      num_epochs=1,
+      ignore_errors=True)
+  return dataset
+
+raw_train_data = get_dataset(train_file_path)
+raw_test_data = get_dataset(test_file_path)
+```
+
+### TFRecord
+
+```python
+# tfrecord 文件格式
+# -> tf.train.Example
+#    -> tf.train.Features -> {"key": tf.train.Feature}
+#       -> tf.train.Feature -> tf.train.ByteList/FloatList/Int64List
+
+favorite_books = [name.encode('utf-8')
+                  for name in ["machine learning", "cc150"]]
+favorite_books_bytelist = tf.train.BytesList(value = favorite_books)
+print(favorite_books_bytelist)
+
+hours_floatlist = tf.train.FloatList(value = [15.5, 9.5, 7.0, 8.0])
+print(hours_floatlist)
+
+age_int64list = tf.train.Int64List(value = [42])
+print(age_int64list)
+
+features = tf.train.Features(
+    feature = {
+        "favorite_books": tf.train.Feature(
+            bytes_list = favorite_books_bytelist),
+        "hours": tf.train.Feature(
+            float_list = hours_floatlist),
+        "age": tf.train.Feature(int64_list = age_int64list),
+    }
+)
+print(features)
+```
+
+### 构建图片数据集
+
+
+
+## 05、tf.estimator
+
+#### feature_columns
+
+```python
+categorical_columns = ['sex', 'n_siblings_spouses','parch', 'class', 'deck', 'embark_town', 'alone']
+numeric_columns = ['age', 'fare']
+
+feature_columns = []
+for categorical_column in categorical_columns:
+    vocab = train_df[categorical_column].unique()
+    print(categorical_column, vocab)
+    feature_columns.append(
+        tf.feature_column.indicator_column(
+            tf.feature_column.categorical_column_with_vocabulary_list(
+                categorical_column,vocab)))
+    
+for categorical_column in numeric_columns:
+    print(categorical_column, vocab)
+    feature_columns.append(tf.feature_column.numeric_column(categorical_column,dtype=tf.float32))
+```
+
+```python
+def make_dataset(data_df, label_df, epochs=10, shuffle=True, batch_size = 32):
+    dataset = tf.data.Dataset.from_tensor_slices((dict(data_df), label_df))
+    if shuffle:
+        dataset = dataset.shuffle(10000)
+    dataset = dataset.repeat(epochs).batch(batch_size)
+    return dataset
+
+train_dataset = make_dataset(train_df, y_train, batch_size=5)
+```
+
+```python
+# keras.layers.DenseFeature
+# 转换测试
+for x,y in train_dataset.take(1):
+    age_column = feature_columns[7]
+    gender_column = feature_columns[0]
+    print(keras.layers.DenseFeatures(age_column,dtype='floate32')(x).numpy())
+    print(keras.layers.DenseFeatures(gender_column,dtype='float32')(x).numpy())
+
+# 转换feature_columns
+for x,y in train_dataset.take(1):
+    print(keras.layers.DenseFeatures(feature_columns)(x).numpy())
+```
+
+#### keras to estimator
+
+```python
+model = keras.Sequential()
+model.add(keras.layers.DenseFeatures(feature_columns))
+model.add(keras.layers.Dense(100,activation='relu'))
+model.add(keras.layers.Dense(100,activation='relu'))
+model.add(keras.layers.Dense(2,activation='softmax'))
+
+model.compile(loss='sparse_categorical_crossentropy',
+              optimizer = keras.optimizers.SGD(lr=0.01),
+              metrics=['accuracy'])
+```
+
+```python
+# 1. model.fit
+# 2. model -> estimator -> train
+
+train_dataset = make_dataset(train_df, y_train, epochs=100)
+eval_dataset = make_dataset(eval_df, y_eval, epochs=1, shuffle=False)
+history = model.fit(train_dataset,
+                    validation_data=eval_dataset,
+                    steps_per_epoch=10,
+                    validation_steps=8,
+                    epochs=100)
+```
+
+```python
+estimator = keras.estimator.model_to_estimator(model)
+# input_fn格式
+# 1. function
+# 2. 必须返回return a.(features, labels) b.(dataset) -> (feature, label)
+estimator.train(input_fn = lambda:make_dataset(train_df, y_train, epochs=100)) # lambda封装成没有参数的函数
+```
+
+#### 使用预定义estimator
+
+```python
+
+```
+
+
+
+#### 交叉特征
+
+```python
+# cross feature:对离散特征做笛卡尔积 age:[1,2,3,4,5] gender:['male','fmale']
+# age_x_gender: [(1,male),(2,male),...,(5,male),(1.fmale),...,(5,fmale)]
+# 100000:100 -> hash(100000 values) % 100 把可能的10万个稀疏特征hash映射到100个桶中
+
+feature_columns.append(
+    tf.feature_column.indicator_column(
+        tf.feature_column.crossed_column(['age','sex'],
+                                         hash_bucket_size=100)))
+```
+
+
+
+## 06、卷积网络
+
+### 基本结构
+
+```python
+model = keras.models.Sequential()
+model.add(keras.layers.Conv2D(filters=32, kernel_size=3,
+                              padding='same',
+                              activation='relu',
+                              input_shape=(28,28,1)))
+model.add(keras.layers.Conv2D(filters=32, kernel_size=3,
+                              padding='same',
+                              activation='relu'))
+model.add(keras.layers.MaxPool2D(pool_size=2))
+model.add(keras.layers.Conv2D(filters=64, kernel_size=3, # 经过池化卷积核翻倍
+                              padding='same',
+                              activation='relu'))
+model.add(keras.layers.Conv2D(filters=64, kernel_size=3,
+                              padding='same',
+                              activation='relu'))
+model.add(keras.layers.MaxPool2D(pool_size=2))
+model.add(keras.layers.Conv2D(filters=128, kernel_size=3,
+                              padding='same',
+                              activation='relu'))
+model.add(keras.layers.Conv2D(filters=128, kernel_size=3,
+                              padding='same',
+                              activation='relu'))
+model.add(keras.layers.MaxPool2D(pool_size=2))
+model.add(keras.layers.Flatten())
+
+model.add(keras.layers.Dense(128, activation='relu'))
+model.add(keras.layers.Dense(10, activation='softmax'))
+
+model.compile(loss="sparse_categorical_crossentropy",
+              optimizer = "sgd",
+              metrics = ["accuracy"])
+```
+
+
+
+### 深度可分离卷积
+
+深度可分离卷积分为两步：
+
+- 第一步用三个卷积对三个通道分别做卷积，这样在一次卷积后，输出3个数。
+- 这输出的三个数，再通过一个1x1x3的卷积核（pointwise核），得到一个数。
+
+所以深度可分离卷积其实是通过两次卷积实现的。
+
+第一步，对三个通道分别做卷积，输出三个通道的属性：
+
+![image-20200102003959848](J:\03_NOTES\ML\TensorFlow2.x.assets\image-20200102003959848.png)
+
+第二步，用卷积核1x1x3对三个通道再次做卷积，这个时候的输出就和正常卷积一样，是8x8x1：
+
+![image-20200102004013504](J:\03_NOTES\ML\TensorFlow2.x.assets\image-20200102004013504.png)
+
+如果要提取更多的属性，则需要设计更多的1x1x3卷积核心就可以
+
+![image-20200102004116073](J:\03_NOTES\ML\TensorFlow2.x.assets\image-20200102004116073.png)
+
+```python
+model = keras.models.Sequential()
+model.add(keras.layers.Conv2D(filters=32, kernel_size=3,
+                              padding='same',
+                              activation='relu',
+                              input_shape=(28,28,1)))
+model.add(keras.layers.SeparableConv2D(filters=32, kernel_size=3, # 输入层以外用深度可分离卷积
+                              padding='same',
+                              activation='relu'))
+model.add(keras.layers.MaxPool2D(pool_size=2))
+model.add(keras.layers.SeparableConv2D(filters=64, kernel_size=3,
+                              padding='same',
+                              activation='relu'))
+model.add(keras.layers.SeparableConv2D(filters=64, kernel_size=3,
+                              padding='same',
+                              activation='relu'))
+model.add(keras.layers.MaxPool2D(pool_size=2))
+model.add(keras.layers.SeparableConv2D(filters=128, kernel_size=3,
+                              padding='same',
+                              activation='relu'))
+model.add(keras.layers.SeparableConv2D(filters=128, kernel_size=3,
+                              padding='same',
+                              activation='relu'))
+model.add(keras.layers.MaxPool2D(pool_size=2))
+model.add(keras.layers.Flatten())
+
+model.add(keras.layers.Dense(128, activation='relu'))
+model.add(keras.layers.Dense(10, activation='softmax'))
+
+model.compile(loss="sparse_categorical_crossentropy",
+              optimizer = "sgd",
+              metrics = ["accuracy"])
+```
+
+### 数据增强
+
+
+
+### 迁移学习
+
+```python
+resnet50_fine_tune = keras.models.Sequential()
+resnet50_fine_tune.add(keras.applications.ResNet50(include_top = False,
+                                                   pooling = 'avg',
+                                                   weights = 'imagenet'))
+resnet50_fine_tune.add(keras.layers.Dense(num_classes, activation = 'softmax'))
+resnet50_fine_tune.layers[0].trainable = False
+
+model.compile(loss="sparse_categorical_crossentropy",
+              optimizer = "sgd",
+              metrics = ["accuracy"])
+```
+
+```python
+# 后5层可训练
+resnet50 = keras.applications.ResNet50(include_top = False,
+                                       pooling = 'avg',
+                                       weights = 'imagenet')
+for layer in resnet50.layers[0:-5]:
+    layer.trainable = False
+    
+resnet50_new = keras.models.Sequential([
+    resnet50,
+    keras.layers.Dense(num_classes, activation = 'softmax')
+])
+```
+
+
+
+
+
+## 07、循环网络
+
+## 08、分布式训练
+
+## 09、模型保存与部署
+
+## 10、机器翻译实战
+
+
+
+
+
+
+
+
 
 
 
