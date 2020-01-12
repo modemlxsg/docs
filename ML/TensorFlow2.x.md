@@ -1,4 +1,4 @@
-# TensorFlow2.x
+#  TensorFlow2.x
 
 ## 01、分类
 
@@ -550,6 +550,10 @@ model.summary()
 model.compile(loss="mean_squared_error", optimizer="sgd")
 callbacks = [keras.callbacks.EarlyStopping(
     patience=5, min_delta=1e-2)]
+
+for i in range(5):
+    exec('var{}={}'.format(i,i))
+print(var0,var1,var2,var3,var4)
 ```
 
 ### tf.function & autograph
@@ -900,7 +904,7 @@ metric([1.], [3.])
 print(metric.result())
 ```
 
-#### 手动遍历求导
+#### 手动训练求导
 
 ```python
 # 1. batch 遍历训练集 metric
@@ -1045,10 +1049,8 @@ print(age_int64list)
 
 features = tf.train.Features(
     feature = {
-        "favorite_books": tf.train.Feature(
-            bytes_list = favorite_books_bytelist),
-        "hours": tf.train.Feature(
-            float_list = hours_floatlist),
+        "favorite_books": tf.train.Feature(bytes_list = favorite_books_bytelist),
+        "hours": tf.train.Feature(float_list = hours_floatlist),
         "age": tf.train.Feature(int64_list = age_int64list),
     }
 )
@@ -1056,6 +1058,10 @@ print(features)
 ```
 
 ### 构建图片数据集
+
+https://github.com/modemlxsg/docs/blob/master/ML/notebooks/tf_data_image.ipynb
+
+
 
 
 
@@ -1301,6 +1307,8 @@ resnet50_new = keras.models.Sequential([
 ## 08、分布式训练
 
 ## 09、模型保存与部署
+
+TFLite - FlatBuffer
 
 ## 10、机器翻译实战
 

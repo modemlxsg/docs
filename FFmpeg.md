@@ -615,7 +615,7 @@ ffplay -f lavfi -i smptebars -vf transpose=2,vflip
 ffmpeg -i input.mpg -vf boxblur=1.5:1 output.mp4
 ```
 
-另一个FFmpeg模糊效果过滤器与是smartblur过滤器在表中描述:
+另一个FFmpeg模糊效果过滤器与是`smartblur`过滤器在表中描述:
 
 | 描述        | 模糊输入而不影响轮廓                                         |
 | ----------- | ------------------------------------------------------------ |
