@@ -104,7 +104,7 @@ model.compile(loss="mean_squared_error", optimizer="sgd")
 
 ### wide & deep
 
-![image-20191231045955865](J:\03_NOTES\ML\TensorFlow2.x.assets\image-20191231045955865.png)
+![image-20191231045955865](J:\03_NOTES\ML\images\TensorFlow2.x.assets\image-20191231045955865.png)
 
 ### 函数式API
 
@@ -268,7 +268,7 @@ model = random_search_cv.best_estimator_.model
 model.evaluate(x_test_scaled, y_test)
 ```
 
-![image-20191231052116047](J:\03_NOTES\ML\TensorFlow2.x.assets\image-20191231052116047.png)
+![image-20191231052116047](J:\03_NOTES\ML\images\TensorFlow2.x.assets\image-20191231052116047.png)
 
 ## 03、基础API
 
@@ -1221,15 +1221,15 @@ model.compile(loss="sparse_categorical_crossentropy",
 
 第一步，对三个通道分别做卷积，输出三个通道的属性：
 
-![image-20200102003959848](J:\03_NOTES\ML\TensorFlow2.x.assets\image-20200102003959848.png)
+![image-20200102003959848](J:\03_NOTES\ML\images\TensorFlow2.x.assets\image-20200102003959848.png)
 
 第二步，用卷积核1x1x3对三个通道再次做卷积，这个时候的输出就和正常卷积一样，是8x8x1：
 
-![image-20200102004013504](J:\03_NOTES\ML\TensorFlow2.x.assets\image-20200102004013504.png)
+![image-20200102004013504](J:\03_NOTES\ML\images\TensorFlow2.x.assets\image-20200102004013504.png)
 
 如果要提取更多的属性，则需要设计更多的1x1x3卷积核心就可以
 
-![image-20200102004116073](J:\03_NOTES\ML\TensorFlow2.x.assets\image-20200102004116073.png)
+![image-20200102004116073](J:\03_NOTES\ML\images\TensorFlow2.x.assets\image-20200102004116073.png)
 
 ```python
 model = keras.models.Sequential()
