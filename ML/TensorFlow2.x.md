@@ -104,7 +104,7 @@ model.compile(loss="mean_squared_error", optimizer="sgd")
 
 ### wide & deep
 
-![image-20191231045955865](J:\03_NOTES\ML\images\TensorFlow2.x.assets\image-20191231045955865.png)
+![image-20191231045955865](./images\TensorFlow2.x.assets\image-20191231045955865.png)
 
 ### 函数式API
 
