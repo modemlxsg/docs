@@ -5,6 +5,10 @@
 - 行内公式：用 `$`包裹公式
 - 独立公式：用 `$$`包裹公式。
 
+### 换行
+
+**\\\\** 表示换行  
+
 ###  角标（上下标）
 
 **上标命令**：`^{}`
@@ -19,6 +23,14 @@
 
 **二次根式命令**：`$\sqrt{表达式}$`
 **N次根式命令**：`$\sqrt[n]{表达式}$`
+
+### 对数
+
+`\log_ax` $\log_ax$
+
+`\ln x` $\ln x$ 
+
+`\lg x` $\lg x$ 
 
 ### 求和、积分、极限
 
@@ -96,7 +108,177 @@ $\left| \sum_i \vec{v}_i \left|\Delta t_i\right|  \right|$
 
 
 
+### 环境对齐
+
+对于非简写的环境（begin和end包裹的）都有两种形式，一种直接写环境名，会参与**自动编号**；另一种是在环境名后面加一个星号“*”，不会参与编号。
+
+```latex
+\begin{align*}
+ f(x) &= (x+a)(x+b) \\
+ &= x^2 + (a+b)x + ab
+\end{align*}
+```
+
+$$
+\begin{align*}
+ f(x) &= (x+a)(x+b) \\
+ &= x^2 + (a+b)x + ab
+\end{align*}
+$$
+
+```latex
+\begin{array}{cc}
+        (A)\quad 4 & \hspace{4cm}(B)\quad 3\\\\
+        (B)\quad 2 & \hspace{4cm}(D)\quad 1
+\end{array}
+```
+
+$$
+\begin{array}{cc}
+        (A)\quad 4 & \hspace{4cm}(B)\quad 3\\\\
+        (B)\quad 2 & \hspace{4cm}(D)\quad 1
+\end{array}
+$$
+
+- **tip：**`\quad`和`\hspace{}`都是表示空格，但是空的个数不同
+
+
+
+
+
+### 矩阵
+
+**普通写法：**
+
+```latex
+\begin{array}{ccc}
+    1 & 0 & 0\\\\
+    0 & 1 & 0\\\\
+    0 & 0 & 1\\\\
+\end{array}
+```
+
+$$
+\begin{array}{ccc}
+    1 & 0 & 0\\
+    0 & 1 & 0\\
+    0 & 0 & 1\\
+\end{array}
+$$
+
+```latex
+\left[
+    \begin{array}{ccc}
+        1 & 0 & 0\\
+        0 & 1 & 0\\
+        0 & 0 & 1\\
+    \end{array}
+\right]
+```
+
+$$
+\left[
+    \begin{array}{ccc}
+        1 & 0 & 0\\
+        0 & 1 & 0\\
+        0 & 0 & 1\\
+    \end{array}
+\right]
+$$
+
+- {ccc}是指元素的对齐方法（居中），此外还有`l`和`r`的参数可选，分别表示左和右
+
+
+
+**矩阵环境写法：**
+
+直接用`matrix、pmatrix(带小括号)、bmatrix(带中括号)、Bmatrix(带大括号)、vmatrix(行列式)、Vmatrix(两条竖线)`环境:
+
+```latex
+\begin{gathered}
+\begin{matrix} 0 & 1 \\ 1 & 0 \end{matrix}
+\quad
+\begin{pmatrix} 0 & -i \\ i & 0 \end{pmatrix}
+\quad
+\begin{bmatrix} 0 & -1 \\ 1 & 0 \end{bmatrix}
+\quad
+\begin{Bmatrix} 1 & 0 \\ 0 & -1 \end{Bmatrix}
+\quad
+\begin{vmatrix} a & b \\ c & d \end{vmatrix}
+\quad
+\begin{Vmatrix} i & 0 \\ 0 & -i \end{Vmatrix}
+\end{gathered}
+```
+
+$$
+\begin{gathered}
+\begin{matrix} 0 & 1 \\ 1 & 0 \end{matrix}
+\quad
+\begin{pmatrix} 0 & -i \\ i & 0 \end{pmatrix}
+\quad
+\begin{bmatrix} 0 & -1 \\ 1 & 0 \end{bmatrix}
+\quad
+\begin{Bmatrix} 1 & 0 \\ 0 & -1 \end{Bmatrix}
+\quad
+\begin{vmatrix} a & b \\ c & d \end{vmatrix}
+\quad
+\begin{Vmatrix} i & 0 \\ 0 & -i \end{Vmatrix}
+\end{gathered}
+$$
+
+
+
+**复杂矩阵：**
+
+```latex
+A = 
+    \begin{pmatrix}
+        a_{11} & a_{12} & \cdots & a_{1n}\\
+        a_{21} & a_{22} & \cdots & a_{2n}\\
+        \vdots & \vdots & \ddots & \vdots\\
+        a_{n1} & a_{n2} & \cdots & a_{nn}\\
+    \end{pmatrix}
+```
+
+$$
+A = 
+    \begin{pmatrix}
+        a_{11} & a_{12} & \cdots & a_{1n}\\
+        a_{21} & a_{22} & \cdots & a_{2n}\\
+        \vdots & \vdots & \ddots & \vdots\\
+        a_{n1} & a_{n2} & \cdots & a_{nn}\\
+    \end{pmatrix}
+$$
+
+- **tip：**横排列的点 ⋯⋯ 用`\cdots`表示，列排列的点 ⋮⋮ 用`\vdots`表示，斜排列的点 ⋱⋱ 用`\ddots`表示
+
+
+
+**表格:**
+
+```latex
+\begin{array}{|c|c|}
+        \hline
+        0 & 1 \\\\\hline
+        1 & 0 \\\\\hline
+\end{array}
+```
+
+$$
+\begin{array}{|c|c|}
+        \hline
+        0 & 1 \\\hline
+        1 & 0 \\\hline
+\end{array}
+$$
+
+- **tip：**`\hline`表示水平线，而竖线可以使用`|`来表示
+
+
+
 ### 希腊字母
+
+默认小写，大写首字母大写。例如 \Omega
 
 小写	大写	latex
 α	A	\alpha

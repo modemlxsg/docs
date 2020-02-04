@@ -1065,6 +1065,8 @@ https://github.com/modemlxsg/docs/blob/master/ML/notebooks/tf_data_image.ipynb
 
 
 
+
+
 ## 05、tf.estimator
 
 #### feature_columns
@@ -1221,7 +1223,7 @@ model.compile(loss="sparse_categorical_crossentropy",
 
 第一步，对三个通道分别做卷积，输出三个通道的属性：
 
-![image-20200102003959848](J:\03_NOTES\ML\images\TensorFlow2.x.assets\image-20200102003959848.png)
+![image-20200102003959848](images\TensorFlow2.x.assets\image-20200102003959848.png)
 
 第二步，用卷积核1x1x3对三个通道再次做卷积，这个时候的输出就和正常卷积一样，是8x8x1：
 
@@ -1308,12 +1310,312 @@ resnet50_new = keras.models.Sequential([
 
 ## 09、模型保存与部署
 
+![image-20200201162847217](images/TensorFlow2.x.assets/image-20200201162847217.png)
+
+
+
+### 模型保存
+
+
+
+#### 全模型保存
+
+This file includes:
+
+- The model's architecture
+- The model's weight values (which were learned during training)
+- The model's training config (what you passed to `compile`), if any
+- The optimizer and its state, if any (this enables you to restart training where you left off)
+
+```python
+# Save the model
+model.save('path_to_my_model.h5')
+
+# Recreate the exact same model purely from the file
+new_model = keras.models.load_model('path_to_my_model.h5')
+```
+
+
+
+#### 导出为SavedModel格式
+
+还可以将整个模型导出为`TensorFlow SavedModel`格式。SavedModel是TensorFlow对象的独立序列化格式，由TensorFlow服务以及Python以外的TensorFlow实现支持
+
+The `SavedModel` files that were created contain:
+
+- A TensorFlow `checkpoint` containing the model weights.
+- A `SavedModel` proto containing the underlying TensorFlow graph.
+
+```python
+# Export the model to a SavedModel
+model.save('path_to_saved_model', save_format='tf')
+
+# Recreate the exact same model
+new_model = keras.models.load_model('path_to_saved_model')
+
+# Check that the state is preserved
+new_predictions = new_model.predict(x_test)
+np.testing.assert_allclose(predictions, new_predictions, rtol=1e-6, atol=1e-6)
+
+# Note that the optimizer state is preserved as well:
+# you can resume training where you left off.
+```
+
+
+
+#### 只保存模型结构
+
+有时，您只对模型的体系结构感兴趣，而不需要保存权重值或优化器。在本例中，您可以通过`get_config()方法`检索模型的“config”。配置是Python dict，它允许您重新创建相同的模型--从头开始初始化，而不需要以前在培训期间学到的任何信息。
+
+```python
+config = model.get_config()
+reinitialized_model = keras.Model.from_config(config)
+
+# Note that the model state is not preserved! We only saved the architecture.
+new_predictions = reinitialized_model.predict(x_test)
+assert abs(np.sum(predictions - new_predictions)) > 0.
+```
+
+您也可以使用`to_json() 和 from_json()`，它使用JSON字符串来存储配置，而不是Python dict。这对于将配置保存到磁盘非常有用。
+
+```python
+json_config = model.to_json()
+reinitialized_model = keras.models.model_from_json(json_config)
+```
+
+
+
+
+
+#### 只保存模型参数
+
+有时，您只对模型的状态感兴趣--它的权重值--而不是对体系结构感兴趣。在本例中，您可以通过`get_weights()`检索权重值作为Numpy数组的列表，并通过`set_weights()`设置模型的状态：
+
+```python
+weights = model.get_weights()  # Retrieves the state of the model.
+model.set_weights(weights)  # Sets the state of the model.
+```
+
+您可以将`get_config()/from_config()`和`get_weights()/set_weights()`组合起来，以便在相同的状态下重新创建模型。但是与`model.Save()`不同，这将不包括培训配置和优化器。在使用该模型进行培训之前，您必须再次调用`compile()`。
+
+```python
+config = model.get_config()
+weights = model.get_weights()
+
+new_model = keras.Model.from_config(config)
+new_model.set_weights(weights)
+
+# Check that the state is preserved
+new_predictions = new_model.predict(x_test)
+np.testing.assert_allclose(predictions, new_predictions, rtol=1e-6, atol=1e-6)
+
+# Note that the optimizer was not preserved,
+# so the model should be compiled anew before training
+# (and the optimizer will start from a blank state).
+```
+
+```python
+# Save JSON config to disk
+json_config = model.to_json()
+with open('model_config.json', 'w') as json_file:
+    json_file.write(json_config)
+# Save weights to disk
+model.save_weights('path_to_my_weights.h5')
+
+# Reload the model from the 2 files we saved
+with open('model_config.json') as json_file:
+    json_config = json_file.read()
+new_model = keras.models.model_from_json(json_config)
+new_model.load_weights('path_to_my_weights.h5')
+
+# Check that the state is preserved
+new_predictions = new_model.predict(x_test)
+np.testing.assert_allclose(predictions, new_predictions, rtol=1e-6, atol=1e-6)
+
+# Note that the optimizer was not preserved.
+```
+
+
+
+#### 使用checkpoints保存参数
+
+注意，`save_weights()`可以创建Keras `HDF5格式`的文件，也可以创建TensorFlow检查点格式的文件。该格式是从您提供的文件扩展名推断出来的：如果是`“.h5”或“.keras`”，则框架使用Keras HDF 5格式。其他任何默认设置为检查点。
+
+```python
+# 对于完全显式性，格式可以通过Save_Format参数显式传递，该参数可以取值“tf”或“h5”
+model.save_weights('path_to_my_tf_checkpoint', save_format='tf')
+```
+
+
+
+
+
+#### 保存子类化模型
+
+ **Sequential** 模型和**Functional** 模型是表示层的DAG的数据结构。因此，它们可以安全地序列化和反序列化。
+
+子类模型的不同之处在于它不是数据结构，而是一段代码。模型的体系结构是通过调用方法的主体来定义的。这意味着模型的体系结构不能安全地序列化。要加载模型，您需要访问创建它的代码(模型子类的代码)。或者，您可以将此代码序列化为字节码，但这是不安全的，而且通常不可移植。
+
+首先，无法保存从未使用过的子类模型。这是因为需要对某些数据调用子类模型，以创建其权重。
+
+保存子类模型的推荐方法是使用`save_weights()`创建一个TensorFlow SavedModel Checkpoint，该检查点将包含与模型关联的所有变量的值：
+
+- The layers' weights
+- The optimizer's state
+- Any variables associated with stateful model metrics (if any)
+
+```python
+model.save_weights('path_to_my_weights', save_format='tf')
+```
+
+若要还原模型，需要访问创建模型对象的代码。请注意，为了恢复优化器状态和任何有状态度量的状态，您应该编译模型(参数与前面完全相同)，并在调用`load_weights()`之前对某些数据进行调用：
+
+```python
+# Recreate the model
+new_model = get_model()
+new_model.compile(loss='sparse_categorical_crossentropy',
+                  optimizer=keras.optimizers.RMSprop())
+
+# This initializes the variables used by the optimizers,
+# as well as any stateful metric variables
+new_model.train_on_batch(x_train[:1], y_train[:1])
+
+# Load the state of the old model
+new_model.load_weights('path_to_my_weights')
+
+# Check that the model state has been preserved
+new_predictions = new_model.predict(x_test)
+np.testing.assert_allclose(predictions, new_predictions, rtol=1e-6, atol=1e-6)
+
+# The optimizer state is preserved as well,
+# so you can resume training where you left off
+new_first_batch_loss = new_model.train_on_batch(x_train[:64], y_train[:64])
+assert first_batch_loss == new_first_batch_loss
+```
+
+
+
+### 模型部署
+
 TFLite - FlatBuffer
+
+
 
 ## 10、机器翻译实战
 
 
 
+# TensorFlow2.x API
+
+
+
+## tf
+
+***
+
+### tf.fill
+
+```python
+tf.fill(
+    dims,
+    value,
+    name=None
+)
+```
+
+此操作创建形状`dims`的张量，并将其填充为`value`。
+
+```python
+tf.fill([2, 3], 9) 
+
+<tf.Tensor: shape=(2, 3), dtype=int32, numpy=
+array([[9, 9, 9],
+       [9, 9, 9]])>
+```
+
+
+
+## tf.nn
+
+***
+
+### ctc_loss
+
+```python
+tf.nn.ctc_loss(
+    labels,
+    logits,
+    label_length,
+    logit_length,
+    logits_time_major=True,
+    unique=None,
+    blank_index=None,
+    name=None
+)
+```
+
+**Notes:**
+
+1、标签可以是密集的、零填充的张量，带有标签序列长度的矢量，也可以作为SparseTensor。
+
+2、在TPU和GPU上：只支持密集的填充标签。
+
+3、在CPU上：调用者可以使用SparseTensor或稠密的填充标签，但是使用SparseTenser调用将大大加快速度。
+
+
+
+**Args:**
+
+- **`labels`**: tensor of shape **[batch_size, max_label_seq_length]** or SparseTensor
+- **`logits`**: tensor of shape **[frames, batch_size, num_labels]**, if logits_time_major == False, shape is [batch_size, frames, num_labels].
+- **`label_length`**: tensor of shape **[batch_size]** `None if labels is SparseTensor` Length of reference label sequence in labels.
+- **`logit_length`**: tensor of shape **[batch_size]** Length of input sequence in logits.
+- **`logits_time_major`**: (optional) If True (default), logits is shaped [time, batch, logits]. If False, shape is [batch, time, logits]
+- **`unique`**: (optional) Unique label indices as computed by ctc_unique_labels(labels). If supplied, enable a faster, memory efficient implementation on TPU.
+- **`blank_index`**: (optional) Set the class index to use for the blank label. Negative values will start from num_classes, ie, -1 will reproduce the ctc_loss behavior of using **num_classes - 1** for the blank symbol. There is some memory/performance overhead to switching from the default of 0 as an additional shifted copy of the logits may be created.
+- **`name`**: A name for this `Op`. Defaults to "ctc_loss_dense".
+
+
+
+**Returns:**
+
+- **`loss`**: tensor of shape **[batch_size]**, negative log probabilities.
+
+
+
+###  ctc_greedy_decoder
+
+```python
+tf.nn.ctc_greedy_decoder(
+    inputs,
+    sequence_length,
+    merge_repeated=True
+)
+```
+
+如果`merge_repeated`为真，则`ABB_B_B`合并为`ABBB`。如果为假则为`ABBBB`
+
+**Args:**
+
+- **`inputs`**: 3-D `float` `Tensor` sized `[max_time, batch_size, num_classes]`. The logits.
+- **`sequence_length`**: 1-D `int32` vector containing sequence lengths, having size `[batch_size]`.
+- **`merge_repeated`**: Boolean. Default: True.
+
+
+
+**Returns:**
+
+A tuple `(decoded, neg_sum_logits)` where
+
+- **`decoded`**: A single-element list. `decoded[0]` is an `SparseTensor` containing the decoded outputs.
+
+  `decoded.indices`: Indices matrix `(total_decoded_outputs, 2)`. The rows store: `[batch, time]`.
+
+  `decoded.values`: Values vector, size `(total_decoded_outputs)`. The vector stores the decoded classes.
+
+  `decoded.dense_shape`: Shape vector, size `(2)`. The shape values are: `[batch_size, max_decoded_length]`
+
+- **`neg_sum_logits`**: A `float` matrix `(batch_size x 1)` containing, for the sequence found, the negative of the sum of the greatest logit at each timeframe.
 
 
 
@@ -1325,4 +1627,691 @@ TFLite - FlatBuffer
 
 
 
+
+
+
+
+## tf.keras
+
+***
+
+### metrics
+
+
+
+#### Metric
+
+|                  |                                                              |
+| ---------------- | ------------------------------------------------------------ |
+| **add_weight**   | 添加状态变量。仅供子类使用。                                 |
+| **reset_states** | 重置所有度量状态变量。当在训练期间对度量进行评估时，将在各epochs/steps之间调用此函数。 |
+| **result**       | 计算并返回度量值张量。                                       |
+| **update_state** | 为度量积累统计信息。                                         |
+| **init**         |                                                              |
+
+```python
+model = tf.keras.Sequential()
+model.add(tf.keras.layers.Dense(64, activation='relu'))
+model.add(tf.keras.layers.Dense(64, activation='relu'))
+model.add(tf.keras.layers.Dense(10, activation='softmax'))
+
+model.compile(optimizer=tf.keras.optimizers.RMSprop(0.01),
+              loss=tf.keras.losses.CategoricalCrossentropy(),
+              metrics=[tf.keras.metrics.CategoricalAccuracy()])
+
+data = np.random.random((1000, 32))
+labels = np.random.random((1000, 10))
+
+dataset = tf.data.Dataset.from_tensor_slices((data, labels))
+dataset = dataset.batch(32)
+
+model.fit(dataset, epochs=10)
+```
+
+
+
+#### Mean
+
+计算给定值的(加权)平均值。
+
+这个度量创建了两个变量，总数`total`和计数`count`，用于计算值的平均值。这个平均值最终作为平均值返回，这是一个幂等运算，它简单地将总数除以计数。
+
+```python
+m = tf.keras.metrics.Mean() 
+_ = m.update_state([1, 3, 5, 7]) 
+m.result().numpy() 
+
+m.reset_states() 
+_ = m.update_state([1, 3, 5, 7], sample_weight=[1, 1, 0, 0]) 
+m.result().numpy() 
+```
+
+
+
+### optimizers
+
+
+
+#### Optimizer
+
+这个类定义了添加Ops来训练模型的API。您从不直接使用这个类，而是实例化它的一个子类
+
+```python
+# Create an optimizer with the desired parameters.
+opt = tf.keras.optimizers.SGD(learning_rate=0.1)
+# `loss` is a callable that takes no argument and returns the value
+# to minimize.
+loss = lambda: 3 * var1 * var1 + 2 * var2 * var2
+# In graph mode, returns op that minimizes the loss by updating the listed
+# variables.
+opt_op = opt.minimize(loss, var_list=[var1, var2])
+opt_op.run()
+# In eager mode, simply call minimize to update the list of variables.
+opt.minimize(loss, var_list=[var1, var2])
+```
+
+
+
+**手动训练：**
+
+```python
+opt = tf.keras.optimizers.SGD(learning_rate=0.1)
+model = tf.keras.Sequential()
+model.add(tf.keras.layers.Dense(num_hidden, activation='relu'))
+model.add(tf.keras.layers.Dense(num_classes, activation='sigmoid'))
+
+loss_fn = lambda: tf.keras.losses.mse(model(input), output)
+var_list_fn = lambda: model.trainable_weights
+
+for input, output in data:
+  opt.minimize(loss_fn, var_list_fn)
+```
+
+
+
+| 属性           |                                    |
+| -------------- | ---------------------------------- |
+| **iterations** | 变量。此优化器运行的培训步骤数     |
+| **weights**    | 根据创建的顺序返回此优化器的变量。 |
+
+
+
+|                     |                                                              |
+| ------------------- | ------------------------------------------------------------ |
+| **add_slot**        |                                                              |
+| **add_weigth**      |                                                              |
+| **apply_gradients** | 将梯度应用于变量。这是`minimize()`的第二部分。它返回一个应用梯度的`Operation`。参数：grads_and_vars : List of (gradient, variable) pairs |
+| **from_config**     |                                                              |
+| **get_config**      |                                                              |
+| **get_gradients**   |                                                              |
+| **get_slot**        |                                                              |
+| **get_slot_names**  |                                                              |
+| **get_updates**     |                                                              |
+| **get_weights**     |                                                              |
+| **minimize**        | 通过更新`var_list`将`loss`降到最低。此方法使用`tf.GradientTape`计算梯度，并调用`apply_gradients()`。如果您想在应用之前处理梯度，那么就显式地调用，而不是使用这个函数。 |
+| **set_weights**     |                                                              |
+| **variables**       |                                                              |
+|                     |                                                              |
+
+
+
+#### schedules
+
+|                            |                                      |
+| -------------------------- | ------------------------------------ |
+| **ExponentialDecay**       | 使用**指数衰减**的学习率计划表       |
+| **InverseTimeDecay**       | 使用**逆时间衰减**的学习率计划表     |
+| **LearningRateSchedule**   | 使用**可串行化**的学习率衰减时间表。 |
+| **PiecewiseConstantDecay** | 使用**分段常数衰减**的学习率计划表。 |
+| **PolynomialDecay**        | 使用**多项式衰减**的学习速率计划表。 |
+
+```python
+initial_learning_rate = 0.1
+lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
+    initial_learning_rate,
+    decay_steps=100000,
+    decay_rate=0.96,
+    staircase=True)
+
+model.compile(optimizer=tf.keras.optimizers.SGD(learning_rate=lr_schedule),
+              loss='sparse_categorical_crossentropy',
+              metrics=['accuracy'])
+
+model.fit(data, labels, epochs=5)
+```
+
+
+
+**ExponentialDecay**
+
+在训练模型时，往往建议随着训练的进行而降低学习率。该计划在给定初始学习速率的情况下，将指数衰减函数应用于优化器步骤。
+
+```python
+__init__(
+    initial_learning_rate,
+    decay_steps,
+    decay_rate,
+    staircase=False,
+    name=None
+)
+```
+
+计算如下：
+
+如果参数`staircase`为真，那么`step / decay_steps`是整数除法，衰减学习率遵循阶梯函数。学习速率在离散间隔。
+
+```python
+def decayed_learning_rate(step):
+  return initial_learning_rate * decay_rate ^ (step / decay_steps)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+## tf.data
+
+***
+
+### Dataset
+
+
+
+#### map方法
+
+```python
+map(
+    map_func,
+    num_parallel_calls=None
+)
+```
+
+此转换将**map_func**应用于此数据集的每个元素，并返回一个包含转换后的元素的新数据集，其顺序与它们在输入中出现的顺序相同。map_func可用于更改数据集元素的值和结构。例如，向每个元素添加1，或投影元素组件的子集。
+
+**map_func的输入参数取决于此数据集中每个元素的结构**。
+
+```python
+# Each element is a tuple containing two `tf.Tensor` objects. 
+elements = [(1, "foo"), (2, "bar"), (3, "baz)")] 
+dataset = tf.data.Dataset.from_generator( 
+    lambda: elements, (tf.int32, tf.string)) 
+# `map_func` takes two arguments of type `tf.Tensor`. This function 
+# projects out just the first component. 
+result = dataset.map(lambda x_int, y_str: x_int) 
+list(result.as_numpy_iterator()) 
+```
+
+**map_func返回的值确定返回数据集中每个元素的结构。**
+
+```python
+dataset = tf.data.Dataset.range(3) 
+# `map_func` returns two `tf.Tensor` objects. 
+def g(x): 
+  return tf.constant(37.0), tf.constant(["Foo", "Bar", "Baz"]) 
+result = dataset.map(g) 
+result.element_spec 
+
+# Python primitives, lists, and NumPy arrays are implicitly converted to 
+# `tf.Tensor`. 
+def h(x): 
+  return 37.0, ["Foo", "Bar"], np.array([1.0, 2.0], dtype=np.float64) 
+result = dataset.map(h) 
+result.element_spec 
+
+# `map_func` can return nested structures. 
+def i(x): 
+  return (37.0, [42, 16]), "foo" 
+result = dataset.map(i) 
+result.element_spec 
+```
+
+**map_func可以接受作为参数并返回任何类型的DataSet元素。**
+
+要在函数中使用Python代码，有两个选项：
+
+1)依赖签名将Python代码转换为等效的图计算。这种方法的缺点是签名可以转换一些但不是全部Python代码。
+
+2)使用**tf.py_function**，它允许您编写任意Python代码，但通常会导致性能比1差。例如：
+
+```python
+d = tf.data.Dataset.from_tensor_slices(['hello', 'world']) 
+# transform a string tensor to upper case string using a Python function 
+def upper_case_fn(t: tf.Tensor): 
+  return t.numpy().decode('utf-8').upper() 
+
+d = d.map(lambda x: tf.py_function(func=upper_case_fn, inp=[x], Tout=tf.string)) 
+list(d.as_numpy_iterator()) 
+```
+
+
+
+#### interleave方法
+
+```python
+interleave(
+    map_func,
+    cycle_length=AUTOTUNE,
+    block_length=1,
+    num_parallel_calls=None
+)
+```
+
+将map_func映射到此数据集，并将结果交织在一起。
+
+**首先该方法会从该Dataset中取出cycle_length个element，然后对这些element apply map_func, 得到cycle_length个新的Dataset对象。然后从这些新生成的Dataset对象中取数据，每个Dataset对象一次取block_length个数据。当新生成的某个Dataset的对象取尽时，从原Dataset中再取一个element，然后apply map_func，以此类推。**
+
+
+
+```python
+dataset = Dataset.range(1, 6)  # ==> [ 1, 2, 3, 4, 5 ] 
+# NOTE: New lines indicate "block" boundaries. 
+dataset = dataset.interleave( 
+    lambda x: Dataset.from_tensors(x).repeat(6), 
+    cycle_length=2, block_length=4) 
+list(dataset.as_numpy_iterator()) 
+[1, 1, 1, 1, 2, 2, 2, 2, 1, 1, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 3, 3, 4, 4, 5, 5, 5, 5, 5, 5]
+```
+
+
+
+#### batch方法
+
+将此数据集的连续元素组合成批
+
+结果元素的组件将有一个额外的外部维度，即Batch_Size
+
+```python
+batch(
+    batch_size,
+    drop_remainder=False
+)
+```
+
+```python
+dataset = tf.data.Dataset.range(8) 
+dataset = dataset.batch(3) 
+list(dataset.as_numpy_iterator()) 
+
+[array([0, 1, 2], dtype=int64),
+ array([3, 4, 5], dtype=int64),
+ array([6, 7], dtype=int64)]
+```
+
+```python
+dataset = tf.data.Dataset.range(8) 
+dataset = dataset.batch(3, drop_remainder=True) 
+list(dataset.as_numpy_iterator()) 
+
+[array([0, 1, 2], dtype=int64), array([3, 4, 5], dtype=int64)]
+```
+
+
+
+####  padded_batch方法
+
+```python
+padded_batch(
+    batch_size,
+    padded_shapes=None,
+    padding_values=None,
+    drop_remainder=False
+)
+```
+
+将此数据集的连续元素组合到填充的批中,此转换将输入数据集的多个连续元素组合为单个元素。
+
+与`tf.data.Dataset.batch`不同，要组成批的输入元素可能具有不同的形状，此转换将将每个组件以`padded_shapes`的形式填充到相应的形状。`padded_shapes`参数确定输出元素中每个组件的每个维度的最终形状：
+
+- 如果维度是常量，则该组件将在该维度中填充到该长度。
+
+- 如果维度未知，则该组件将被填充到该维度中所有元素的最大长度。
+
+```python
+A = tf.data.Dataset.range(1, 5).map(lambda x: tf.fill([x], x))
+#[1]
+#[2 2]
+#[3 3 3]
+#[4 4 4 4]
+B = A.padded_batch(2, padded_shapes=[None])
+
+for element in B.as_numpy_iterator():
+    print(element) 
+    
+[[1 0]
+ [2 2]]
+[[3 3 3 0]
+ [4 4 4 4]]
+```
+
+
+
+
+
+
+
+### TFRecordWriter
+
+将数据集写入TFRecord文件
+
+数据集的元素必须是标量字符串。要将DataSet元素序列化为字符串，可以使用`tf.io.serialize_tensor`函数。
+
+```python
+#存储
+dataset = tf.data.Dataset.range(3)
+dataset = dataset.map(tf.io.serialize_tensor)
+writer = tf.data.experimental.TFRecordWriter("/path/to/file.tfrecord")
+writer.write(dataset)
+```
+
+```python
+# 读取
+dataset = tf.data.TFRecordDataset("/path/to/file.tfrecord")
+dataset = dataset.map(lambda x: tf.io.parse_tensor(x, tf.int64))
+```
+
+若要在多个TFRecord文件中分解数据集，请执行以下操作
+
+```python
+dataset = ... # dataset to be written
+
+def reduce_func(key, dataset):
+  filename = tf.strings.join([PATH_PREFIX, tf.strings.as_string(key)])
+  writer = tf.data.experimental.TFRecordWriter(filename)
+  writer.write(dataset.map(lambda _, x: x))
+  return tf.data.Dataset.from_tensors(filename)
+
+dataset = dataset.enumerate()
+dataset = dataset.apply(tf.data.experimental.group_by_window(
+  lambda i, _: i % NUM_SHARDS, reduce_func, tf.int64.max
+))
+```
+
+
+
+
+
+
+
+
+
+
+
+## tf.lookup
+
+***
+
+class **KeyValueTensorInitializer**: 由给出的键和值张量初始化表。
+
+class **StaticHashTable**: 初始化后不可变的泛型哈希表。
+
+class **StaticVocabularyTable**: 将词汇表外键分配给桶的字符串到ID表包装器。
+
+class **TextFileIndex**: 从每一行获取的键和值内容。
+
+class **TextFileInitializer**: 文本文件中的表初始化器。
+
+Class **DenseHashTable**: 使用张量作为后备存储的通用可变哈希表实现
+
+
+
+### StaticHashTable
+
+```python
+__init__(
+    initializer,
+    default_value,
+    name=None
+)
+```
+
+
+
+```python
+keys_tensor = tf.constant([1, 2])
+vals_tensor = tf.constant([3, 4])
+input_tensor = tf.constant([1, 5])
+table = tf.lookup.StaticHashTable(
+    tf.lookup.KeyValueTensorInitializer(keys_tensor, vals_tensor), -1)
+print(table.lookup(input_tensor))
+```
+
+**属性:**
+
+|                     |                              |
+| ------------------- | ---------------------------- |
+| **default_value**   |                              |
+| **key_dtype**       |                              |
+| **value_dtype**     |                              |
+| **name**            |                              |
+| **resource_handle** | 返回与此资源关联的资源句柄。 |
+
+
+
+**方法：**
+
+|            |                                                              |
+| ---------- | ------------------------------------------------------------ |
+| **export** | 返回表中所有键和值的张量。                                   |
+| **lookup** | 在表中查找键，输出相应的值。lookup( keys, name=None ) 参数keys是tensor或sparsetensor |
+| **size**   | 计算此表中的元素数。                                         |
+
+
+
+### KeyValueTensorInitializer
+
+```python
+__init__(
+    keys,
+    values,
+    key_dtype=None,
+    value_dtype=None,
+    name=None
+)
+```
+
+
+
+### TextFileInitializer
+
+```python
+__init__(
+    filename,
+    key_dtype,
+    key_index,
+    value_dtype,
+    value_index,
+    vocab_size=None,
+    delimiter='\t',
+    name=None
+)
+```
+
+
+
+**TextFileIndex.LINE_NUMBER** :
+
+**TextFileIndex.WHOLE_LINE** : 
+
+
+
+## tf.strings
+
+***
+
+|                                 |      |
+| ------------------------------- | ---- |
+| **as_string**                   |      |
+| **bytes_split**                 |      |
+| **format**                      |      |
+| **join**                        |      |
+| **length**                      |      |
+| **lower**                       |      |
+| **ngrams**                      |      |
+| **reduce_join**                 |      |
+| **regex_full_match**            |      |
+| **regex_replace**               |      |
+| **split**                       |      |
+| **strip**                       |      |
+| **substr**                      |      |
+| **to_hash_bucket**              |      |
+| **to_hash_bucket_fast**         |      |
+| **to_hash_bucket_strong**       |      |
+| **to_number**                   |      |
+| **unicode_decode**              |      |
+| **unicode_decode_with_offsets** |      |
+| **unicode_encode**              |      |
+| **unicode_script**              |      |
+| **unicode_split**               |      |
+| **unicode_split_with_offsets**  |      |
+| **unicode_transcode**           |      |
+| **unsorted_segment_join**       |      |
+| **upper**                       |      |
+
+
+
+
+
+
+
+
+
+
+
+## tf.sparse
+
+***
+
+
+
+
+
+### to_dense方法
+
+```python
+tf.sparse.to_dense(
+    sp_input,
+    default_value=None,
+    validate_indices=True,
+    name=None
+)
+```
+
+
+
+## tf.image
+
+***
+
+|                                 |                                                        |
+| ------------------------------- | ------------------------------------------------------ |
+| adjust_brightness               | 调整RGB或灰度图像的亮度                                |
+| adjust_contrast                 | 调整RGB或灰度图像的对比度。                            |
+| adjust_gamma                    | 对输入图像执行伽玛校正                                 |
+| adjust_hue                      | 调整RGB图像的色调                                      |
+| adjust_jpeg_quality             | 调整图像的jpeg编码质量                                 |
+| adjust_saturation               | 调整RGB图像的饱和度。                                  |
+| central_crop                    | 裁剪图像的中心区域                                     |
+| combined_non_max_suppression    | 贪婪地按分数的降序选择包围框的子集                     |
+| convert_image_dtype             | 将图像转换为dtype，并在需要时缩放其值                  |
+| crop_and_resize                 | 从输入图像张量中提取作物并调整它们的大小               |
+| crop_to_bounding_box            | 将图像裁剪到指定的边框中                               |
+| decode_and_crop_jpeg            | 解码并裁剪JPEG编码的图像到uint 8张量                   |
+| decode_bmp                      |                                                        |
+| decode_gif                      |                                                        |
+| decode_image                    |                                                        |
+| decode_jpeg                     |                                                        |
+| decode_png                      |                                                        |
+| draw_bounding_boxes             | 在一批图像上绘制边框                                   |
+| encode_jpeg                     |                                                        |
+| encode_png                      |                                                        |
+| extract_glimpse                 | 从输入张量中提取一瞥                                   |
+| extract_jpeg_shape              |                                                        |
+| extract_patches                 |                                                        |
+| flip_left_right                 |                                                        |
+| flip_up_down                    |                                                        |
+| generate_bounding_box_proposals |                                                        |
+| grayscale_to_rgb                |                                                        |
+| hsv_to_rgb                      |                                                        |
+| image_gradients                 |                                                        |
+| is_jpeg                         |                                                        |
+| non_max_suppression             | 贪婪地按分数的降序选择包围框的子集。                   |
+| non_max_suppression_overlaps    |                                                        |
+| non_max_suppression_padded      |                                                        |
+| non_max_suppression_with_scores |                                                        |
+| pad_to_bounding_box             | 衬垫图像与零到指定的高度和宽度。                       |
+| per_image_standardization       | 对图像中的每幅图像进行线性缩放，使其均值为0，方差为1。 |
+| psnr                            | 返回a和b之间的峰值信噪比。                             |
+| random_brightness               |                                                        |
+| random_contrast                 |                                                        |
+| random_crop                     |                                                        |
+| random_flip_left_right          |                                                        |
+| random_flip_up_down             |                                                        |
+| random_hue                      |                                                        |
+| random_jpeg_quality             |                                                        |
+| random_saturation               |                                                        |
+| resize                          |                                                        |
+| resize_with_crop_or_pad         |                                                        |
+| resize_with_pad                 | 调整图像大小并将其设置为目标宽度和高度                 |
+| rgb_to_grayscale                |                                                        |
+| rgb_to_hsv                      |                                                        |
+| rgb_to_yiq                      |                                                        |
+| rgb_to_yuv                      | 将一个或多个图像从RGB转换为YUV。                       |
+| rot90                           | 逆时针旋转图像90度.                                    |
+| sample_distorted_bounding_box   | 为图像生成一个随机扭曲的包围框。                       |
+| sobel_edges                     | 返回一个保持Sobel边映射的张量。                        |
+| ssim                            | 计算img 1和img 2之间的ssim索引。                       |
+| ssim_multiscale                 | 计算img1和img2之间的MS-ssim。                          |
+| total_variation                 | 计算并返回一个或多个图像的总变化。                     |
+| transpose                       | 通过交换高度和宽度尺寸来转换图像。                     |
+| yiq_to_rgb                      | 将一个或多个图像从YIQ转换为RGB。                       |
+| yuv_to_rgb                      | 将一个或多个图像从YUV转换为RGB                         |
+
+
+
+### draw_bounding_boxes
+
+```python
+tf.image.draw_bounding_boxes(
+    images,
+    boxes,
+    colors,
+    name=None
+)
+```
+
+输出图像副本，但在框中位置指定的像素零或多个边界框的顶部绘制。框中每个边框的坐标编码为[y_min，x_min，y_max，x_max]。包围框坐标在[0.0，1.0]中相对于基础图像的宽度和高度浮动。
+
+例如，如果图像为100 x 200像素(高度x宽度)，而边界框为[0.1，0.2，0.5，0.9]，则边界框的左上角和右下角坐标将为(40，10)至(180，50)(在(x，y)坐标中)。
+
+
+
+Args:
+
+- **`images`**: A `Tensor`. Must be one of the following types: `float32`, `half`. 4-D with shape `[batch, height, width, depth]`. A batch of images.
+- **`boxes`**: A `Tensor` of type `float32`. 3-D with shape `[batch, num_bounding_boxes, 4]` containing bounding boxes.
+- **`colors`**: A `Tensor` of type `float32`. 2-D. A list of RGBA colors to cycle through for the boxes.
+- **`name`**: A name for the operation (optional).
+
+Returns:
+
+A `Tensor`. Has the same type as `images`.
+
+```python
+# create an empty image
+img = tf.zeros([1, 28, 28, 3])
+box = np.array([0, 0, 0.5, 0.5])
+boxes = box.reshape([1, 1, 4])
+
+# alternate between red and blue
+colors = np.array([[1.0, 0.0, 0.0], [0.0, 0.0, 1.0]])
+img_bbox = tf.image.draw_bounding_boxes(img, boxes, colors)
+```
 
