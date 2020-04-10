@@ -1,0 +1,9 @@
+{
+    "python.testing.pytestArgs": [
+        "--capture=no",
+        "-s"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.nosetestsEnabled": false,
+    "python.testing.pytestEnabled": true
+}

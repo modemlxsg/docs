@@ -1,0 +1,17 @@
+dataset:
+  SynthText:
+    root_dir : H:/dataset/mnt/ramdisk/max/90kDICT32px
+    train_num : 100
+    val_num : 20
+    test_num : 80
+    img_height: 32
+
+lexicon:
+  chars : abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-
+  blank : 62
+
+crnn : 
+  imgH : 32
+  nc : 1
+  nh : 256
+  nClass : 63
