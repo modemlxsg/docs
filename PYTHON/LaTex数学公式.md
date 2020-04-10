@@ -78,9 +78,15 @@ $\left| \sum_i \vec{v}_i \left|\Delta t_i\right|  \right|$
 
 ### 集合
 
+<<<<<<< HEAD
 |  ∈   |  ∋   |    ⊂    |    ⊃    |     ⊆     |     ⊇     | $A\cap B$ | $A\cup B$ |
 | :--: | :--: | :-----: | :-----: | :-------: | :-------: | :-------: | :-------: |
 | \in  | \ni  | \subset | \supset | \subseteq | \supseteq |   \cap    |   \cup    |
+=======
+|  ∈   |  ∋   |    ⊂    |    ⊃    |     ⊆     |     ⊇     |      |      |
+| :--: | :--: | :-----: | :-----: | :-------: | :-------: | ---- | ---- |
+| \in  | \ni  | \subset | \supset | \subseteq | \supseteq |      |      |
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 ### 存在
 

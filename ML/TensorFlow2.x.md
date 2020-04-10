@@ -1,10 +1,16 @@
 #  TensorFlow2.x
 
+<<<<<<< HEAD
 ## 教程
 
 ### 01、分类
 
 #### Import
+=======
+## 01、分类
+
+### Import
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 ```python
 import matplotlib.pyplot as plt
@@ -18,7 +24,11 @@ from tensorflow import keras
 print(tf.__version__)
 ```
 
+<<<<<<< HEAD
 #### 加载数据
+=======
+### 加载数据
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 ```python
 fashion_mnist = keras.datasets.fashion_mnist
@@ -29,7 +39,11 @@ y_valid,y_train = y_train_all[:5000],y_train_all[5000:]
 print(x_valid.shape,x_train.shape,x_test.shape)
 ```
 
+<<<<<<< HEAD
 #### 归一化
+=======
+### 归一化
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 ```python
 from sklearn.preprocessing import StandardScaler
@@ -40,7 +54,11 @@ x_valid_scaled = scalar.transform(x_valid.astype(np.float32).reshape(-1,1)).resh
 x_test_scaled = scalar.transform(x_test.astype(np.float32).reshape(-1,1)).reshape(-1,28,28)
 ```
 
+<<<<<<< HEAD
 #### 构建模型
+=======
+### 构建模型
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 ```python
 model = keras.models.Sequential()
@@ -57,7 +75,11 @@ model.compile(loss="sparse_categorical_crossentropy",
               metrics = ["accuracy"])
 ```
 
+<<<<<<< HEAD
 #### 训练
+=======
+### 训练
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 ```python
 # callbacks
@@ -76,7 +98,11 @@ history = model.fit(x_train_scaled,y_train,epochs=10,
                     callbacks=callbacks)
 ```
 
+<<<<<<< HEAD
 #### 绘图
+=======
+### 绘图
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 ```python
 def plot_learning_curves(history):
@@ -90,9 +116,15 @@ plot_learning_curves(history)
 
 
 
+<<<<<<< HEAD
 ### 02、回归
 
 #### Model
+=======
+## 02、回归
+
+### Model
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 ```python
 model = keras.models.Sequential([
@@ -104,11 +136,19 @@ model.summary()
 model.compile(loss="mean_squared_error", optimizer="sgd")
 ```
 
+<<<<<<< HEAD
 #### wide & deep
 
 ![image-20191231045955865](./images\TensorFlow2.x.assets\image-20191231045955865.png)
 
 #### 函数式API
+=======
+### wide & deep
+
+![image-20191231045955865](./images\TensorFlow2.x.assets\image-20191231045955865.png)
+
+### 函数式API
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 ```python
 # 函数式API 功能API
@@ -134,7 +174,11 @@ history = model.fit(x_train_scaled, y_train,
                     callbacks = callbacks)
 ```
 
+<<<<<<< HEAD
 #### 子类化API
+=======
+### 子类化API
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 ```python
 # 子类API
@@ -170,7 +214,11 @@ history = model.fit(x_train_scaled, y_train,
                     callbacks = callbacks)
 ```
 
+<<<<<<< HEAD
 #### 多输入
+=======
+### 多输入
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 ```python
 # 多输入
@@ -190,7 +238,11 @@ callbacks = [keras.callbacks.EarlyStopping(
 model.summary()
 ```
 
+<<<<<<< HEAD
 #### 多输出
+=======
+### 多输出
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 ```python
 # 多输出
@@ -211,7 +263,11 @@ callbacks = [keras.callbacks.EarlyStopping(
 model.summary()
 ```
 
+<<<<<<< HEAD
 #### 超参数搜索
+=======
+### 超参数搜索
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 ```python
 # RandomizedSearchCV
@@ -270,11 +326,19 @@ model = random_search_cv.best_estimator_.model
 model.evaluate(x_test_scaled, y_test)
 ```
 
+<<<<<<< HEAD
 ![image-20191231052116047](images\TensorFlow2.x.assets\image-20191231052116047.png)
 
 ### 03、基础API
 
 #### 常量
+=======
+![image-20191231052116047](J:\03_NOTES\ML\images\TensorFlow2.x.assets\image-20191231052116047.png)
+
+## 03、基础API
+
+### 常量
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 ```python
 t = tf.constant([[1., 2., 3.], [4., 5., 6.]])
@@ -330,7 +394,11 @@ print(t.shape)
 ()
 ```
 
+<<<<<<< HEAD
 #### Strings
+=======
+### Strings
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 ```python
 # strings
@@ -342,6 +410,10 @@ print(tf.strings.unicode_decode(t, "UTF8"))
 
 tf.Tensor(b'cafe', shape=(), dtype=string)
 tf.Tensor(4, shape=(), dtype=int32)
+<<<<<<< HEAD
+=======
+tf.Tensor(4, shape=(), dtype=int32)
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 tf.Tensor([ 99  97 102 101], shape=(4,), dtype=int32)
 
 # string array
@@ -354,7 +426,11 @@ tf.Tensor([4 6 2], shape=(3,), dtype=int32)
 <tf.RaggedTensor [[99, 97, 102, 101], [99, 111, 102, 102, 101, 101], [21654, 21857]]>
 ```
 
+<<<<<<< HEAD
 #### ragged tensor
+=======
+### ragged tensor
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 ```python
 # ragged tensor
@@ -388,7 +464,11 @@ tf.Tensor(
  [41  0  0]], shape=(4, 3), dtype=int32)
 ```
 
+<<<<<<< HEAD
 #### sparse tensor
+=======
+### sparse tensor
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 ```python
 # sparse tensor
@@ -450,7 +530,11 @@ tf.Tensor(
  [0. 0. 0. 3.]], shape=(3, 4), dtype=float32)
 ```
 
+<<<<<<< HEAD
 #### 变量
+=======
+### 变量
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 ```python
 # Variables
@@ -485,7 +569,11 @@ print(v.numpy())
  [ 7.  8.  9.]]
 ```
 
+<<<<<<< HEAD
 #### 自定义loss
+=======
+### 自定义loss
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 ```python
 def customized_mse(y_true, y_pred):
@@ -505,7 +593,11 @@ history = model.fit(x_train_scaled, y_train,
                     callbacks = callbacks)
 ```
 
+<<<<<<< HEAD
 #### 自定义layer
+=======
+### 自定义layer
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 ```python
 # lambda
@@ -557,7 +649,11 @@ for i in range(5):
 print(var0,var1,var2,var3,var4)
 ```
 
+<<<<<<< HEAD
 #### tf.function & autograph
+=======
+### tf.function & autograph
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 在TensorFlow 2.0中，默认情况下启用了急切执行。 对于用户而言直观且灵活（运行一次性操作更容易，更快），但这可能会牺牲性能和可部署性。
 
@@ -681,7 +777,11 @@ cube_func_int32.graph.get_tensor_by_name("x:0")
 cube_func_int32.graph.as_graph_def()
 ```
 
+<<<<<<< HEAD
 #### 自定义求导
+=======
+### 自定义求导
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 ```python
 def f(x):
@@ -840,9 +940,15 @@ print(x)
 <tf.Variable 'Variable:0' shape=() dtype=float32, numpy=-0.3333333>
 ```
 
+<<<<<<< HEAD
 #### 自定义求导与tf.keras实例
 
 ##### Import
+=======
+### 自定义求导与tf.keras实例
+
+#### Import
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 ```python
 import matplotlib as mpl
@@ -859,7 +965,11 @@ import tensorflow as tf
 from tensorflow import keras
 ```
 
+<<<<<<< HEAD
 ##### 数据集
+=======
+#### 数据集
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 ```python
 from sklearn.datasets import fetch_california_housing
@@ -880,7 +990,11 @@ print(x_valid.shape, y_valid.shape)
 print(x_test.shape, y_test.shape)
 ```
 
+<<<<<<< HEAD
 ##### 归一化
+=======
+#### 归一化
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 ```python
 from sklearn.preprocessing import StandardScaler
@@ -891,7 +1005,11 @@ x_valid_scaled = scaler.transform(x_valid)
 x_test_scaled = scaler.transform(x_test)
 ```
 
+<<<<<<< HEAD
 ##### metric使用
+=======
+#### metric使用
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 ```python
 # metric使用
@@ -905,7 +1023,11 @@ metric([1.], [3.])
 print(metric.result())
 ```
 
+<<<<<<< HEAD
 ##### 手动训练求导
+=======
+#### 手动训练求导
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 ```python
 # 1. batch 遍历训练集 metric
@@ -951,9 +1073,15 @@ for epoch in range(epochs):
 
 
 
+<<<<<<< HEAD
 ### 04、tf.data
 
 #### 基础API
+=======
+## 04、tf.data
+
+### 基础API
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 ```python
 dataset = tf.data.Dataset.from_tensor_slices(np.arange(10))
@@ -1012,7 +1140,11 @@ for item in dataset4:
 [5 6] b'fox'
 ```
 
+<<<<<<< HEAD
 #### CSV
+=======
+### CSV
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 ```python
 def get_dataset(file_path):
@@ -1029,6 +1161,7 @@ raw_train_data = get_dataset(train_file_path)
 raw_test_data = get_dataset(test_file_path)
 ```
 
+<<<<<<< HEAD
 #### TFRecord
 
 TFRecord文件包含一系列记录。该文件只能按顺序读取。
@@ -1219,6 +1352,38 @@ for raw_record in raw_dataset.take(1):
 
 
 #### 构建图片数据集
+=======
+### TFRecord
+
+```python
+# tfrecord 文件格式
+# -> tf.train.Example
+#    -> tf.train.Features -> {"key": tf.train.Feature}
+#       -> tf.train.Feature -> tf.train.ByteList/FloatList/Int64List
+
+favorite_books = [name.encode('utf-8')
+                  for name in ["machine learning", "cc150"]]
+favorite_books_bytelist = tf.train.BytesList(value = favorite_books)
+print(favorite_books_bytelist)
+
+hours_floatlist = tf.train.FloatList(value = [15.5, 9.5, 7.0, 8.0])
+print(hours_floatlist)
+
+age_int64list = tf.train.Int64List(value = [42])
+print(age_int64list)
+
+features = tf.train.Features(
+    feature = {
+        "favorite_books": tf.train.Feature(bytes_list = favorite_books_bytelist),
+        "hours": tf.train.Feature(float_list = hours_floatlist),
+        "age": tf.train.Feature(int64_list = age_int64list),
+    }
+)
+print(features)
+```
+
+### 构建图片数据集
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 https://github.com/modemlxsg/docs/blob/master/ML/notebooks/tf_data_image.ipynb
 
@@ -1228,7 +1393,11 @@ https://github.com/modemlxsg/docs/blob/master/ML/notebooks/tf_data_image.ipynb
 
 
 
+<<<<<<< HEAD
 ### 05、tf.estimator
+=======
+## 05、tf.estimator
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 #### feature_columns
 
@@ -1333,9 +1502,15 @@ feature_columns.append(
 
 
 
+<<<<<<< HEAD
 ### 06、卷积网络
 
 #### 基本结构
+=======
+## 06、卷积网络
+
+### 基本结构
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 ```python
 model = keras.models.Sequential()
@@ -1373,7 +1548,11 @@ model.compile(loss="sparse_categorical_crossentropy",
 
 
 
+<<<<<<< HEAD
 #### 深度可分离卷积
+=======
+### 深度可分离卷积
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 深度可分离卷积分为两步：
 
@@ -1388,11 +1567,19 @@ model.compile(loss="sparse_categorical_crossentropy",
 
 第二步，用卷积核1x1x3对三个通道再次做卷积，这个时候的输出就和正常卷积一样，是8x8x1：
 
+<<<<<<< HEAD
 ![image-20200102004013504](images\TensorFlow2.x.assets\image-20200102004013504.png)
 
 如果要提取更多的属性，则需要设计更多的1x1x3卷积核心就可以
 
 ![image-20200102004116073](images\TensorFlow2.x.assets\image-20200102004116073.png)
+=======
+![image-20200102004013504](J:\03_NOTES\ML\images\TensorFlow2.x.assets\image-20200102004013504.png)
+
+如果要提取更多的属性，则需要设计更多的1x1x3卷积核心就可以
+
+![image-20200102004116073](J:\03_NOTES\ML\images\TensorFlow2.x.assets\image-20200102004116073.png)
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 ```python
 model = keras.models.Sequential()
@@ -1428,11 +1615,19 @@ model.compile(loss="sparse_categorical_crossentropy",
               metrics = ["accuracy"])
 ```
 
+<<<<<<< HEAD
 #### 数据增强
 
 
 
 #### 迁移学习
+=======
+### 数据增强
+
+
+
+### 迁移学习
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 ```python
 resnet50_fine_tune = keras.models.Sequential()
@@ -1463,19 +1658,37 @@ resnet50_new = keras.models.Sequential([
 
 
 
+<<<<<<< HEAD
 ### 08、分布式训练
 
 ### 09、模型保存与部署
+=======
+
+
+## 07、循环网络
+
+## 08、分布式训练
+
+## 09、模型保存与部署
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 ![image-20200201162847217](images/TensorFlow2.x.assets/image-20200201162847217.png)
 
 
 
+<<<<<<< HEAD
 #### 模型保存
 
 
 
 ##### 全模型保存
+=======
+### 模型保存
+
+
+
+#### 全模型保存
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 This file includes:
 
@@ -1494,9 +1707,13 @@ new_model = keras.models.load_model('path_to_my_model.h5')
 
 
 
+<<<<<<< HEAD
 ##### 导出为SavedModel格式
 
 
+=======
+#### 导出为SavedModel格式
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 还可以将整个模型导出为`TensorFlow SavedModel`格式。SavedModel是TensorFlow对象的独立序列化格式，由TensorFlow服务以及Python以外的TensorFlow实现支持
 
@@ -1505,6 +1722,7 @@ The `SavedModel` files that were created contain:
 - A TensorFlow `checkpoint` containing the model weights.
 - A `SavedModel` proto containing the underlying TensorFlow graph.
 
+<<<<<<< HEAD
 以SavedModel格式保存模型时，tensorflow将创建一个SavedModel目录，该目录由以下子目录和文件组成：
 
 ```kotlin
@@ -1526,6 +1744,8 @@ saved_model.pb|saved_model.pbtxt
 
 
 
+=======
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 ```python
 # Export the model to a SavedModel
 model.save('path_to_saved_model', save_format='tf')
@@ -1543,7 +1763,11 @@ np.testing.assert_allclose(predictions, new_predictions, rtol=1e-6, atol=1e-6)
 
 
 
+<<<<<<< HEAD
 ##### 只保存模型结构
+=======
+#### 只保存模型结构
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 有时，您只对模型的体系结构感兴趣，而不需要保存权重值或优化器。在本例中，您可以通过`get_config()方法`检索模型的“config”。配置是Python dict，它允许您重新创建相同的模型--从头开始初始化，而不需要以前在培训期间学到的任何信息。
 
@@ -1567,7 +1791,11 @@ reinitialized_model = keras.models.model_from_json(json_config)
 
 
 
+<<<<<<< HEAD
 ##### 只保存模型参数
+=======
+#### 只保存模型参数
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 有时，您只对模型的状态感兴趣--它的权重值--而不是对体系结构感兴趣。在本例中，您可以通过`get_weights()`检索权重值作为Numpy数组的列表，并通过`set_weights()`设置模型的状态：
 
@@ -1617,7 +1845,11 @@ np.testing.assert_allclose(predictions, new_predictions, rtol=1e-6, atol=1e-6)
 
 
 
+<<<<<<< HEAD
 ##### 使用checkpoints保存参数
+=======
+#### 使用checkpoints保存参数
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 注意，`save_weights()`可以创建Keras `HDF5格式`的文件，也可以创建TensorFlow检查点格式的文件。该格式是从您提供的文件扩展名推断出来的：如果是`“.h5”或“.keras`”，则框架使用Keras HDF 5格式。其他任何默认设置为检查点。
 
@@ -1630,7 +1862,11 @@ model.save_weights('path_to_my_tf_checkpoint', save_format='tf')
 
 
 
+<<<<<<< HEAD
 ##### 保存子类化模型
+=======
+#### 保存子类化模型
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
  **Sequential** 模型和**Functional** 模型是表示层的DAG的数据结构。因此，它们可以安全地序列化和反序列化。
 
@@ -1675,12 +1911,17 @@ assert first_batch_loss == new_first_batch_loss
 
 
 
+<<<<<<< HEAD
 #### 模型部署
+=======
+### 模型部署
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 TFLite - FlatBuffer
 
 
 
+<<<<<<< HEAD
 ## Tutorials
 
 ### keras训练和评估
@@ -2021,10 +2262,196 @@ model.compile(optimizer=keras.optimizers.RMSprop(1e-3),
 model.fit(x_train, y_train,
           batch_size=64,
           epochs=1)
+=======
+## 10、机器翻译实战
+
+
+
+# TensorFlow2.x API
+
+
+
+## tf
+
+***
+
+### tf.fill
+
+```python
+tf.fill(
+    dims,
+    value,
+    name=None
+)
+```
+
+此操作创建形状`dims`的张量，并将其填充为`value`。
+
+```python
+tf.fill([2, 3], 9) 
+
+<tf.Tensor: shape=(2, 3), dtype=int32, numpy=
+array([[9, 9, 9],
+       [9, 9, 9]])>
 ```
 
 
 
+## tf.nn
+
+***
+
+### ctc_loss
+
+```python
+tf.nn.ctc_loss(
+    labels,
+    logits,
+    label_length,
+    logit_length,
+    logits_time_major=True,
+    unique=None,
+    blank_index=None,
+    name=None
+)
+```
+
+**Notes:**
+
+1、标签可以是密集的、零填充的张量，带有标签序列长度的矢量，也可以作为SparseTensor。
+
+2、在TPU和GPU上：只支持密集的填充标签。
+
+3、在CPU上：调用者可以使用SparseTensor或稠密的填充标签，但是使用SparseTenser调用将大大加快速度。
+
+
+
+**Args:**
+
+- **`labels`**: tensor of shape **[batch_size, max_label_seq_length]** or SparseTensor
+- **`logits`**: tensor of shape **[frames, batch_size, num_labels]**, if logits_time_major == False, shape is [batch_size, frames, num_labels].
+- **`label_length`**: tensor of shape **[batch_size]** `None if labels is SparseTensor` Length of reference label sequence in labels.
+- **`logit_length`**: tensor of shape **[batch_size]** Length of input sequence in logits.
+- **`logits_time_major`**: (optional) If True (default), logits is shaped [time, batch, logits]. If False, shape is [batch, time, logits]
+- **`unique`**: (optional) Unique label indices as computed by ctc_unique_labels(labels). If supplied, enable a faster, memory efficient implementation on TPU.
+- **`blank_index`**: (optional) Set the class index to use for the blank label. Negative values will start from num_classes, ie, -1 will reproduce the ctc_loss behavior of using **num_classes - 1** for the blank symbol. There is some memory/performance overhead to switching from the default of 0 as an additional shifted copy of the logits may be created.
+- **`name`**: A name for this `Op`. Defaults to "ctc_loss_dense".
+
+
+
+**Returns:**
+
+- **`loss`**: tensor of shape **[batch_size]**, negative log probabilities.
+
+
+
+###  ctc_greedy_decoder
+
+```python
+tf.nn.ctc_greedy_decoder(
+    inputs,
+    sequence_length,
+    merge_repeated=True
+)
+```
+
+如果`merge_repeated`为真，则`ABB_B_B`合并为`ABBB`。如果为假则为`ABBBB`
+
+**Args:**
+
+- **`inputs`**: 3-D `float` `Tensor` sized `[max_time, batch_size, num_classes]`. The logits.
+- **`sequence_length`**: 1-D `int32` vector containing sequence lengths, having size `[batch_size]`.
+- **`merge_repeated`**: Boolean. Default: True.
+
+
+
+**Returns:**
+
+A tuple `(decoded, neg_sum_logits)` where
+
+- **`decoded`**: A single-element list. `decoded[0]` is an `SparseTensor` containing the decoded outputs.
+
+  `decoded.indices`: Indices matrix `(total_decoded_outputs, 2)`. The rows store: `[batch, time]`.
+
+  `decoded.values`: Values vector, size `(total_decoded_outputs)`. The vector stores the decoded classes.
+
+  `decoded.dense_shape`: Shape vector, size `(2)`. The shape values are: `[batch_size, max_decoded_length]`
+
+- **`neg_sum_logits`**: A `float` matrix `(batch_size x 1)` containing, for the sequence found, the negative of the sum of the greatest logit at each timeframe.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## tf.keras
+
+***
+
+### metrics
+
+
+
+#### Metric
+
+|                  |                                                              |
+| ---------------- | ------------------------------------------------------------ |
+| **add_weight**   | 添加状态变量。仅供子类使用。                                 |
+| **reset_states** | 重置所有度量状态变量。当在训练期间对度量进行评估时，将在各epochs/steps之间调用此函数。 |
+| **result**       | 计算并返回度量值张量。                                       |
+| **update_state** | 为度量积累统计信息。                                         |
+| **init**         |                                                              |
+
+```python
+model = tf.keras.Sequential()
+model.add(tf.keras.layers.Dense(64, activation='relu'))
+model.add(tf.keras.layers.Dense(64, activation='relu'))
+model.add(tf.keras.layers.Dense(10, activation='softmax'))
+
+model.compile(optimizer=tf.keras.optimizers.RMSprop(0.01),
+              loss=tf.keras.losses.CategoricalCrossentropy(),
+              metrics=[tf.keras.metrics.CategoricalAccuracy()])
+
+data = np.random.random((1000, 32))
+labels = np.random.random((1000, 10))
+
+dataset = tf.data.Dataset.from_tensor_slices((data, labels))
+dataset = dataset.batch(32)
+
+model.fit(dataset, epochs=10)
+```
+
+
+
+#### Mean
+
+计算给定值的(加权)平均值。
+
+这个度量创建了两个变量，总数`total`和计数`count`，用于计算值的平均值。这个平均值最终作为平均值返回，这是一个幂等运算，它简单地将总数除以计数。
+
+```python
+m = tf.keras.metrics.Mean() 
+_ = m.update_state([1, 3, 5, 7]) 
+m.result().numpy() 
+
+m.reset_states() 
+_ = m.update_state([1, 3, 5, 7], sample_weight=[1, 1, 0, 0]) 
+m.result().numpy() 
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
+```
+
+
+
+<<<<<<< HEAD
 ###### 自动区分验证保留集
 
 在您看到的第一个端到端示例中，我们使用`validation_data`参数将Numpy数组的元组传递`(x_val, y_val)`给模型，以在每个时期结束时评估验证损失和验证指标。
@@ -2038,10 +2465,33 @@ model.fit(x_train, y_train,
 ```python
 model = get_compiled_model()
 model.fit(x_train, y_train, batch_size=64, validation_split=0.2, epochs=1, steps_per_epoch=1)
+=======
+### optimizers
+
+
+
+#### Optimizer
+
+这个类定义了添加Ops来训练模型的API。您从不直接使用这个类，而是实例化它的一个子类
+
+```python
+# Create an optimizer with the desired parameters.
+opt = tf.keras.optimizers.SGD(learning_rate=0.1)
+# `loss` is a callable that takes no argument and returns the value
+# to minimize.
+loss = lambda: 3 * var1 * var1 + 2 * var2 * var2
+# In graph mode, returns op that minimizes the loss by updating the listed
+# variables.
+opt_op = opt.minimize(loss, var_list=[var1, var2])
+opt_op.run()
+# In eager mode, simply call minimize to update the list of variables.
+opt.minimize(loss, var_list=[var1, var2])
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 ```
 
 
 
+<<<<<<< HEAD
 ##### 来自tf.data数据集的培训和评估
 
 在过去的几段中，您已经了解了如何处理损失，指标和优化器，并且已经了解了如何在将数据作为Numpy数组传递时使用`validation_data`和`validation_split`中的和参数`fit`。现在让我们看一下您的数据以tf.data数据集形式出现的情况。
@@ -3028,6 +3478,29 @@ for input, output in data:
 | -------------- | ---------------------------------- |
 | **iterations** | 变量。此优化器运行的培训步骤数     |
 | **weights**    | 根据创建的顺序返回此优化器的变量。 |
+=======
+**手动训练：**
+
+```python
+opt = tf.keras.optimizers.SGD(learning_rate=0.1)
+model = tf.keras.Sequential()
+model.add(tf.keras.layers.Dense(num_hidden, activation='relu'))
+model.add(tf.keras.layers.Dense(num_classes, activation='sigmoid'))
+
+loss_fn = lambda: tf.keras.losses.mse(model(input), output)
+var_list_fn = lambda: model.trainable_weights
+
+for input, output in data:
+  opt.minimize(loss_fn, var_list_fn)
+```
+
+
+
+| 属性           |                                    |
+| -------------- | ---------------------------------- |
+| **iterations** | 变量。此优化器运行的培训步骤数     |
+| **weights**    | 根据创建的顺序返回此优化器的变量。 |
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 
 
@@ -3077,13 +3550,26 @@ model.fit(data, labels, epochs=5)
 
 
 
+<<<<<<< HEAD
 ##### ExponentialDecay
+=======
+**ExponentialDecay**
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 在训练模型时，往往建议随着训练的进行而降低学习率。该计划在给定初始学习速率的情况下，将指数衰减函数应用于优化器步骤。
 
 ```python
+<<<<<<< HEAD
 tf.keras.optimizers.schedules.ExponentialDecay(
     initial_learning_rate, decay_steps, decay_rate, staircase=False, name=None
+=======
+__init__(
+    initial_learning_rate,
+    decay_steps,
+    decay_rate,
+    staircase=False,
+    name=None
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 )
 ```
 
@@ -3098,6 +3584,7 @@ def decayed_learning_rate(step):
 
 
 
+<<<<<<< HEAD
 Args:
 
 - **`initial_learning_rate`**: A scalar `float32` or `float64` `Tensor` or a Python number. The initial learning rate.
@@ -3137,6 +3624,11 @@ To be implemented by subclasses:
 ```
 
 
+=======
+
+
+
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 
 
@@ -3150,6 +3642,7 @@ To be implemented by subclasses:
 
 ### Dataset
 
+<<<<<<< HEAD
 #### \__iter__
 
 创建一个Iterator来枚举此数据集的元素
@@ -3352,6 +3845,11 @@ ds = tf.data.Dataset.zip((a, b))
 
 
 #### map
+=======
+
+
+#### map方法
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 ```python
 map(
@@ -3419,7 +3917,11 @@ list(d.as_numpy_iterator())
 
 
 
+<<<<<<< HEAD
 #### interleave
+=======
+#### interleave方法
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 ```python
 interleave(
@@ -3432,7 +3934,11 @@ interleave(
 
 将map_func映射到此数据集，并将结果交织在一起。
 
+<<<<<<< HEAD
 **首先该方法会从该Dataset中取出cycle_length个element，然后对这些elements apply map_func, 得到cycle_length个新的Dataset对象。然后从这些新生成的Dataset对象中取数据，每个Dataset对象一次取block_length个数据。当新生成的某个Dataset的对象取尽时，从原Dataset中再取一个element，然后apply map_func，以此类推。**
+=======
+**首先该方法会从该Dataset中取出cycle_length个element，然后对这些element apply map_func, 得到cycle_length个新的Dataset对象。然后从这些新生成的Dataset对象中取数据，每个Dataset对象一次取block_length个数据。当新生成的某个Dataset的对象取尽时，从原Dataset中再取一个element，然后apply map_func，以此类推。**
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 
 
@@ -3448,9 +3954,15 @@ list(dataset.as_numpy_iterator())
 
 
 
+<<<<<<< HEAD
 #### batch
 
 将此数据集续元素组合成批
+=======
+#### batch方法
+
+将此数据集的连续元素组合成批
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 结果元素的组件将有一个额外的外部维度，即Batch_Size
 
@@ -3481,7 +3993,11 @@ list(dataset.as_numpy_iterator())
 
 
 
+<<<<<<< HEAD
 ####  padded_batch
+=======
+####  padded_batch方法
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 ```python
 padded_batch(
@@ -3709,6 +4225,7 @@ __init__(
 
 
 
+<<<<<<< HEAD
 ## tf.Ragged
 
 
@@ -3748,6 +4265,8 @@ tf.Tensor(
 
 
 
+=======
+>>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 
 ## tf.sparse
