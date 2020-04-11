@@ -104,7 +104,7 @@ tools -> ssh key generate (RSA 2048 移动鼠标加速生成) -> 修改key comme
 
 ![image-20200122151734811](images/GCP安装.assets/image-20200122151734811.png)
 
-<<<<<<< HEAD
+
 
 
 
@@ -142,8 +142,3 @@ scp H:\dataset\ICDAR2015\ch4_training_images.zip modemlxsg@34.80.205.81:/home/mo
 ```
 
 
-
- 
-
-=======
->>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
