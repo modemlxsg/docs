@@ -1,8 +1,5 @@
-<<<<<<< HEAD
-=======
-# Python
 
->>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
+
 ## 1、Virtualenv
 
 安装命令 `pip install virtualenv`
@@ -78,7 +75,7 @@
 
 
 
-<<<<<<< HEAD
+
 ## 3、argparse
 
 ```python
@@ -441,19 +438,3 @@ get_yaml_load_all(yaml_path)
 | "-ca","--case"                         | Generate upper or lowercase only. arguments: upper or lower. Example: --case upper |
 | "-dt", "--dict"                        | Define the dictionary to be used                             |
 | "-ws", "--word_split",                 | Split on words instead of on characters (preserves ligatures, no character spacing) |
-=======
-
-
-
-
-
-
-
-
-
-
-
-
-
->>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
-

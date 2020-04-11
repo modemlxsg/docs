@@ -20,14 +20,10 @@ cd envs
 virtualenv --system-site-packages -p python3 env_tf2
 source ./env_tf2/bin/activate #激活环境
 
-<<<<<<< HEAD
+
 # 安装TensorFlow or pytorch
 pip install tensorflow
 pip install torch torchvision
-=======
-# 安装TensorFlow
-pip install tensorflow
->>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 # 安装其他库
 pip install numpy pandas matplotlib sklearn jupyterlab
@@ -73,11 +69,7 @@ tf.test.is_gpu_available()
 #解决依赖问题
 #aptitude 与 apt-get 一样，是 Debian 及其衍生系统中功能极其强大的包管理工具。与 apt-get 不同的是，aptitude #在处理依赖问题上更佳一些。
 sudo apt-get install aptitude
-<<<<<<< HEAD
 sudo aptitude install `缺少的包` # 把教程中apt-get改成aptitude进行安装
-=======
-sudo aptitude install `缺少的包`
->>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 ```
 
 
