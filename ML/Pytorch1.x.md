@@ -294,8 +294,6 @@ modelB.load_state_dict(torch.load(PATH), strict=False)
 
 #### Indexing, Slicing, Joining, Mutating Ops
 
-
-
 |                                                              |                                                              |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | torch.**cat**(tensors, dim=0, out=None) → Tensor             |                                                              |
@@ -317,6 +315,58 @@ modelB.load_state_dict(torch.load(PATH), strict=False)
 | torch.**where**(condition, x, y) → Tensor<br />torch.**where**(condition) → tuple of LongTensor | torch.where(condition) is identical to torch.nonzero(condition, as_tuple=True). |
 |                                                              |                                                              |
 |                                                              |                                                              |
+
+
+
+##### torch.index_select
+
+> torch.**index_select**(input, dim, index, out=None) → Tensor
+>
+
+返回一个新的张量，它使用index中的条目沿维度dim索引输入张量。
+
+```python
+>>> x = torch.randn(3, 4)
+>>> x
+tensor([[ 0.1427,  0.0231, -0.5414, -1.0009],
+        [-0.4664,  0.2647, -0.1228, -1.1068],
+        [-1.1734, -0.6571,  0.7230, -0.6004]])
+>>> indices = torch.tensor([0, 2])
+>>> torch.index_select(x, 0, indices)
+tensor([[ 0.1427,  0.0231, -0.5414, -1.0009],
+        [-1.1734, -0.6571,  0.7230, -0.6004]])
+>>> torch.index_select(x, 1, indices)
+tensor([[ 0.1427, -0.5414],
+        [-0.4664, -0.1228],
+        [-1.1734,  0.7230]])
+```
+
+
+
+##### torch.masked_select
+
+> torch.**masked_select**(input, mask, out=None) → Tensor
+
+返回一个新的一维张量，该张量根据布尔型蒙版BoolTensor索引输入张量。
+
+遮罩张量和输入张量的形状不需要匹配，但它们必须是可广播的。
+
+```python
+>>> x = torch.randn(3, 4)
+>>> x
+tensor([[ 0.3552, -2.3825, -0.8297,  0.3477],
+        [-1.2035,  1.2252,  0.5002,  0.6248],
+        [ 0.1307, -2.0608,  0.1244,  2.0139]])
+>>> mask = x.ge(0.5)
+>>> mask
+tensor([[False, False, False, False],
+        [False, True, True, True],
+        [False, False, False, True]])
+>>> torch.masked_select(x, mask)
+tensor([ 1.2252,  0.5002,  0.6248,  2.0139])
+```
+
+
 
 
 
@@ -857,6 +907,26 @@ Variables
 
 
 
+#### CrossEntropyLoss
+
+> CLASS torch.nn.**CrossEntropyLoss**(weight=None, size_average=None, ignore_index=-100, reduce=None, reduction='mean')
+
+此criterion 将`nn.LogSoftmax（）`和`nn.NLLLoss（）`组合在一个类中。
+
+在训练带有C类的分类问题时很有用。如果提供的话，可选参数权重应为一维张量，为每个类分配权重。当您的训练集不平衡时，此功能特别有用。
+
+预期输入将包含每个类的原始，未标准化的分数。
+
+
+
+
+
+
+
+
+
+
+
 ####  CTCLoss
 
 > CLASS torch.nn.**CTCLoss**(blank=0, reduction='mean', zero_infinity=False)
@@ -1092,7 +1162,31 @@ PackedSequence(data=tensor([ 1,  4,  6,  2,  5,  3]), batch_sizes=tensor([ 3,  2
 
 
 
+## torch.Tensor
 
+
+
+### scatter_
+
+> **scatter_**(dim, index, src) → Tensor
+
+将张量src中的所有值写入索引张量中指定的索引处的self中。对于src中的每个值，其输出索引由其在src中对于维度！= dim的索引指定，并由在索引中对维度= dim的对应值指定
+
+```python
+>>> x = torch.rand(2, 5)
+>>> x
+tensor([[ 0.3992,  0.2908,  0.9044,  0.4850,  0.6004],
+        [ 0.5735,  0.9006,  0.6797,  0.4152,  0.1732]])
+>>> torch.zeros(3, 5).scatter_(0, torch.tensor([[0, 1, 2, 0, 0], [2, 0, 0, 1, 2]]), x)
+tensor([[ 0.3992,  0.9006,  0.6797,  0.4850,  0.6004],
+        [ 0.0000,  0.2908,  0.0000,  0.4152,  0.0000],
+        [ 0.5735,  0.0000,  0.9044,  0.0000,  0.1732]])
+
+>>> z = torch.zeros(2, 4).scatter_(1, torch.tensor([[2], [3]]), 1.23)
+>>> z
+tensor([[ 0.0000,  0.0000,  1.2300,  0.0000],
+        [ 0.0000,  0.0000,  0.0000,  1.2300]])
+```
 
 
 
@@ -1379,11 +1473,11 @@ DataLoader构造函数最重要的参数是DataSet，它指示要从DataSet加�
 
 DataLoader支持具有单进程或多进程加载、自定义加载顺序和可选自动批处理(排序)和内存钉扎的映射样式和可迭代样式数据集。
 
+```python
+def collate_fn(batch):
 
-
-
-
-
+	return batch
+```
 
 
 
@@ -1428,6 +1522,23 @@ DataLoader支持具有单进程或多进程加载、自定义加载顺序和可�
 > torch.utils.data.**BatchSampler**(sampler, batch_size, drop_last)
 
 > torch.utils.data.distributed.**DistributedSampler**(dataset, num_replicas=None, rank=None, shuffle=True)
+
+
+
+#### WeightedRandomSampler
+
+> torch.utils.data.**WeightedRandomSampler**(weights, num_samples, replacement=True)
+
+```python
+weights = [2 if label == 1 else 1 for data, label in dataset]
+sampler = WeightedRandomSampler(weights,num_samples=9,replacement=True)
+dataloader = DataLoader(dataset,batch_size=3,sampler=sampler)
+#num_samples采样数目，例：数据集总大小1000，采样100，则从1000中采样100个用于训练
+```
+
+
+
+
 
 
 
@@ -1589,6 +1700,35 @@ optim.SGD([
 > CLASS torch.optim.lr_scheduler.**OneCycleLR**(optimizer, max_lr, total_steps=None, epochs=None, steps_per_epoch=None, pct_start=0.3, anneal_strategy='cos', cycle_momentum=True, base_momentum=0.85, max_momentum=0.95, div_factor=25.0, final_div_factor=10000.0, last_epoch=-1)
 
 > CLASS torch.optim.lr_scheduler.**CosineAnnealingWarmRestarts**(optimizer, T_0, T_mult=1, eta_min=0, last_epoch=-1)
+
+
+
+#### StepLR
+
+> CLASS torch.optim.lr_scheduler.**StepLR**(optimizer, step_size, gamma=0.1, last_epoch=-1)
+
+
+
+```python
+>>> # Assuming optimizer uses lr = 0.05 for all groups
+>>> # lr = 0.05     if epoch < 30
+>>> # lr = 0.005    if 30 <= epoch < 60
+>>> # lr = 0.0005   if 60 <= epoch < 90
+>>> # ...
+>>> scheduler = StepLR(optimizer, step_size=30, gamma=0.1)
+>>> for epoch in range(100):
+>>>     train(...)
+>>>     validate(...)
+>>>     scheduler.step()
+```
+
+
+
+
+
+
+
+
 
 
 
@@ -1784,9 +1924,65 @@ Parameters:
 
   以训练模式导出模型。 目前，ONNX仅面向导出模型以进行推理，因此通常不需要将其设置为True。
 
+- **verbose** (bool, default False) 如果指定，我们将打印出导出跟踪的调试描述。
+
+- **input_names** (*list of strings**,* *default empty list*) – names to assign to the input nodes of the graph, in order
+
+- **output_names** (*list of strings**,* *default empty list*) – names to assign to the output nodes of the graph, in order
+
 - 
 
+- **operator_export_type** (*enum**,* *default OperatorExportTypes.ONNX*) – `OperatorExportTypes.ONNX`: all ops are exported as regular ONNX ops. `OperatorExportTypes.ONNX_ATEN`: all ops are exported as ATen ops. `OperatorExportTypes.ONNX_ATEN_FALLBACK`: if symbolic is missing, fall back on ATen op. `OperatorExportTypes.RAW`: export raw ir.
 
+- **opset_version** ([*int*](https://docs.python.org/3/library/functions.html#int)*,* *default is 9*) – by default we export the model to the opset version of the onnx submodule. Since ONNX’s latest opset may evolve before next stable release, by default we export to one stable opset version. Right now, supported stable opset version is 9. The opset_version must be _onnx_master_opset or in _onnx_stable_opsets which are defined in torch/onnx/symbolic_helper.py
+
+- **do_constant_folding** ([*bool*](https://docs.python.org/3/library/functions.html#bool)*,* *default False*) – If True, the constant-folding optimization is applied to the model during export. Constant-folding optimization will replace some of the ops that have all constant inputs, with pre-computed constant nodes.
+
+- **example_outputs** (*tuple of Tensors**,* *default None*) – Model’s example outputs being exported. example_outputs must be provided when exporting a ScriptModule or TorchScript Function.
+
+- **strip_doc_string** ([*bool*](https://docs.python.org/3/library/functions.html#bool)*,* *default True*) – if True, strips the field “doc_string” from the exported model, which information about the stack trace.
+
+- **dynamic_axes** (*dict*,* *dict*,* *string>>* *or* *dict*,* [*list*](https://docs.python.org/3/library/stdtypes.html#list)*(*[*int*](https://docs.python.org/3/library/functions.html#int)*)**>**,* *default empty dict*) –
+
+  a dictionary to specify dynamic axes of input/output, such that: - KEY: input and/or output names - VALUE: index of dynamic axes for given key and potentially the name to be used for exported dynamic axes. In general the value is defined according to one of the following ways or a combination of both: (1). A list of integers specifying the dynamic axes of provided input. In this scenario automated names will be generated and applied to dynamic axes of provided input/output during export. OR (2). An inner dictionary that specifies a mapping FROM the index of dynamic axis in corresponding input/output TO the name that is desired to be applied on such axis of such input/output during export.
+
+  一个字典，用于指定输入/输出的动态轴，例如：-KEY：输入和/或输出名称-VALUE：给定键的动态轴索引，以及可能用于导出动态轴的名称。 通常，该值是根据以下方式之一或两者的组合定义的：（1）。 指定提供的输入的动态轴的整数列表。 在这种情况下，将在导出过程中自动生成名称并将其应用于提供的输入/输出的动态轴。 或（2）。 一个内部字典，该字典指定从对应的输入/输出中的动态轴的索引到在导出过程中希望在此输入/输出的该轴上应用的名称的映射。
+
+  例。如果我们的输入和输出具有以下形状：
+
+  ```python
+  shape(input_1) = ('b', 3, 'w', 'h')
+  and shape(input_2) = ('b', 4)
+  and shape(output)  = ('b', 'd', 5)
+  ```
+
+  然后可以将动态轴定义为
+
+  **(a). ONLY INDICES:**
+
+  `dynamic_axes = {‘input_1’:[0, 2, 3], ‘input_2’:[0], ‘output’:[0, 1]}`
+
+  where automatic names will be generated for exported dynamic axes
+
+  **(b). INDICES WITH CORRESPONDING NAMES:**
+
+  `dynamic_axes = {‘input_1’:{0:’batch’, 1:’width’, 2:’height’}, ‘input_2’:{0:’batch’}, ‘output’:{0:’batch’, 1:’detections’}`
+
+  where provided names will be applied to exported dynamic axes
+
+  **(c). MIXED MODE OF (a) and (b)**
+
+  `dynamic_axes = {‘input_1’:[0, 2, 3], ‘input_2’:{0:’batch’}, ‘output’:[0,1]}`
+
+- **keep_initializers_as_inputs** ([*bool*](https://docs.python.org/3/library/functions.html#bool)*,* *default None*) – If True, all the initializers (typically corresponding to parameters) in the exported graph will also be added as inputs to the graph. If False, then initializers are not added as inputs to the graph, and only the non-parameter inputs are added as inputs. This may allow for better optimizations (such as constant folding etc.) by backends/runtimes that execute these graphs. If unspecified (default None), then the behavior is chosen automatically as follows. If operator_export_type is OperatorExportTypes.ONNX, the behavior is equivalent to setting this argument to False. For other values of operator_export_type, the behavior is equivalent to setting this argument to True. Note that for ONNX opset version < 9, initializers MUST be part of graph inputs. Therefore, if opset_version argument is set to a 8 or lower, this argument will be ignored.
+
+  如果为True，则导出的图中的所有初始化程序（通常对应于参数）也将作为输入添加到图中。 如果为False，则不会将初始化程序添加为图形的输入，而仅将非参数输入添加为输入。 通过执行这些图形的后端/运行时，这可以允许进行更好的优化（例如恒定折叠等）。 如果未指定（默认为“无”），则按以下方式自动选择行为。 如果operator_export_type为OperatorExportTypes.ONNX，则该行为等效于将此参数设置为False。 对于operator_export_type的其他值，此行为等同于将此参数设置为True。 请注意，对于版本低于9的ONNX opset，初始化程序必须是图形输入的一部分。 因此，如果opset_version参数设置为8或更低，则该参数将被忽略。
+
+- **custom_opsets** (*dict*,* *int>**,* *default empty dict*) – A dictionary to indicate custom opset domain and version at export. If model contains a custom opset, it is optional to specify the domain and opset version in the dictionary: - KEY: opset domain name - VALUE: opset version If the custom opset is not provided in this dictionary, opset version is set to 1 by default.
+
+- **enable_onnx_checker** ([*bool*](https://docs.python.org/3/library/functions.html#bool)*,* *default True*) – If True the onnx model checker will be run as part of the export, to ensure the exported model is a valid ONNX model.
+
+- **external_data_format** ([*bool*](https://docs.python.org/3/library/functions.html#bool)*,* *default False*) – If True, then the model is exported in ONNX external data format, in which case some of the model parameters are stored in external binary files and not in the ONNX model file itself. See link for format details: https://github.com/onnx/onnx/blob/8b3f7e2e7a0f2aba0e629e23d89f07c7fc0e6a5e/onnx/onnx.proto#L423 Also, in this case, argument ‘f’ must be a string specifying the location of the model. The external binary files will be stored in the same location specified by the model location ‘f’. If False, then the model is stored in regular format, i.e. model and parameters are all in one file. This argument is ignored for all export types other than ONNX.
 
 
 

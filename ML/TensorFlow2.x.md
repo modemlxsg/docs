@@ -1,17 +1,10 @@
 #  TensorFlow2.x
 
-<<<<<<< HEAD
 ## 教程
 
 ### 01、分类
 
 #### Import
-=======
-## 01、分类
-
-### Import
->>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
-
 ```python
 import matplotlib.pyplot as plt
 import numpy as np
@@ -24,12 +17,8 @@ from tensorflow import keras
 print(tf.__version__)
 ```
 
-<<<<<<< HEAD
-#### 加载数据
-=======
-### 加载数据
->>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
+#### 加载数据
 ```python
 fashion_mnist = keras.datasets.fashion_mnist
 (x_train_all,y_train_all),(x_test,y_test) = fashion_mnist.load_data()
@@ -39,12 +28,8 @@ y_valid,y_train = y_train_all[:5000],y_train_all[5000:]
 print(x_valid.shape,x_train.shape,x_test.shape)
 ```
 
-<<<<<<< HEAD
-#### 归一化
-=======
-### 归一化
->>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
+#### 归一化
 ```python
 from sklearn.preprocessing import StandardScaler
 
@@ -54,12 +39,8 @@ x_valid_scaled = scalar.transform(x_valid.astype(np.float32).reshape(-1,1)).resh
 x_test_scaled = scalar.transform(x_test.astype(np.float32).reshape(-1,1)).reshape(-1,28,28)
 ```
 
-<<<<<<< HEAD
-#### 构建模型
-=======
-### 构建模型
->>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
+#### 构建模型
 ```python
 model = keras.models.Sequential()
 model.add(keras.layers.Flatten(input_shape=[28, 28]))
@@ -75,12 +56,8 @@ model.compile(loss="sparse_categorical_crossentropy",
               metrics = ["accuracy"])
 ```
 
-<<<<<<< HEAD
-#### 训练
-=======
-### 训练
->>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
+#### 训练
 ```python
 # callbacks
 logdir = os.path.join('cnn-callbacks')
@@ -98,11 +75,9 @@ history = model.fit(x_train_scaled,y_train,epochs=10,
                     callbacks=callbacks)
 ```
 
-<<<<<<< HEAD
+
 #### 绘图
-=======
-### 绘图
->>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
+
 
 ```python
 def plot_learning_curves(history):
@@ -116,16 +91,10 @@ plot_learning_curves(history)
 
 
 
-<<<<<<< HEAD
+
 ### 02、回归
 
 #### Model
-=======
-## 02、回归
-
-### Model
->>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
-
 ```python
 model = keras.models.Sequential([
     keras.layers.Dense(30, activation='relu',
@@ -136,20 +105,12 @@ model.summary()
 model.compile(loss="mean_squared_error", optimizer="sgd")
 ```
 
-<<<<<<< HEAD
+
 #### wide & deep
 
 ![image-20191231045955865](./images\TensorFlow2.x.assets\image-20191231045955865.png)
 
 #### 函数式API
-=======
-### wide & deep
-
-![image-20191231045955865](./images\TensorFlow2.x.assets\image-20191231045955865.png)
-
-### 函数式API
->>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
-
 ```python
 # 函数式API 功能API
 input = keras.layers.Input(shape=x_train.shape[1:])
@@ -174,11 +135,9 @@ history = model.fit(x_train_scaled, y_train,
                     callbacks = callbacks)
 ```
 
-<<<<<<< HEAD
+
 #### 子类化API
-=======
-### 子类化API
->>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
+
 
 ```python
 # 子类API
@@ -214,11 +173,8 @@ history = model.fit(x_train_scaled, y_train,
                     callbacks = callbacks)
 ```
 
-<<<<<<< HEAD
 #### 多输入
-=======
-### 多输入
->>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
+
 
 ```python
 # 多输入
@@ -238,11 +194,9 @@ callbacks = [keras.callbacks.EarlyStopping(
 model.summary()
 ```
 
-<<<<<<< HEAD
+
 #### 多输出
-=======
-### 多输出
->>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
+
 
 ```python
 # 多输出
@@ -263,12 +217,8 @@ callbacks = [keras.callbacks.EarlyStopping(
 model.summary()
 ```
 
-<<<<<<< HEAD
-#### 超参数搜索
-=======
-### 超参数搜索
->>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
+#### 超参数搜索
 ```python
 # RandomizedSearchCV
 # 1. 转化为sklearn的model
@@ -326,20 +276,12 @@ model = random_search_cv.best_estimator_.model
 model.evaluate(x_test_scaled, y_test)
 ```
 
-<<<<<<< HEAD
+
 ![image-20191231052116047](images\TensorFlow2.x.assets\image-20191231052116047.png)
 
 ### 03、基础API
 
 #### 常量
-=======
-![image-20191231052116047](J:\03_NOTES\ML\images\TensorFlow2.x.assets\image-20191231052116047.png)
-
-## 03、基础API
-
-### 常量
->>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
-
 ```python
 t = tf.constant([[1., 2., 3.], [4., 5., 6.]])
 
@@ -394,11 +336,9 @@ print(t.shape)
 ()
 ```
 
-<<<<<<< HEAD
+
 #### Strings
-=======
-### Strings
->>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
+
 
 ```python
 # strings
@@ -428,9 +368,7 @@ tf.Tensor([4 6 2], shape=(3,), dtype=int32)
 
 <<<<<<< HEAD
 #### ragged tensor
-=======
-### ragged tensor
->>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
+>>>>>
 
 ```python
 # ragged tensor
@@ -1073,16 +1011,10 @@ for epoch in range(epochs):
 
 
 
-<<<<<<< HEAD
+
 ### 04、tf.data
 
 #### 基础API
-=======
-## 04、tf.data
-
-### 基础API
->>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
-
 ```python
 dataset = tf.data.Dataset.from_tensor_slices(np.arange(10))
 print(dataset)
@@ -1140,12 +1072,8 @@ for item in dataset4:
 [5 6] b'fox'
 ```
 
-<<<<<<< HEAD
-#### CSV
-=======
-### CSV
->>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
+#### CSV
 ```python
 def get_dataset(file_path):
   dataset = tf.data.experimental.make_csv_dataset(
@@ -1393,12 +1321,8 @@ https://github.com/modemlxsg/docs/blob/master/ML/notebooks/tf_data_image.ipynb
 
 
 
-<<<<<<< HEAD
-### 05、tf.estimator
-=======
-## 05、tf.estimator
->>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
+### 05、tf.estimator
 #### feature_columns
 
 ```python
@@ -1502,15 +1426,11 @@ feature_columns.append(
 
 
 
-<<<<<<< HEAD
+
 ### 06、卷积网络
 
 #### 基本结构
-=======
-## 06、卷积网络
 
-### 基本结构
->>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 ```python
 model = keras.models.Sequential()
@@ -1573,13 +1493,12 @@ model.compile(loss="sparse_categorical_crossentropy",
 如果要提取更多的属性，则需要设计更多的1x1x3卷积核心就可以
 
 ![image-20200102004116073](images\TensorFlow2.x.assets\image-20200102004116073.png)
-=======
-![image-20200102004013504](J:\03_NOTES\ML\images\TensorFlow2.x.assets\image-20200102004013504.png)
+
+![image-20200102004013504](images\TensorFlow2.x.assets\image-20200102004013504.png)
 
 如果要提取更多的属性，则需要设计更多的1x1x3卷积核心就可以
 
-![image-20200102004116073](J:\03_NOTES\ML\images\TensorFlow2.x.assets\image-20200102004116073.png)
->>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
+
 
 ```python
 model = keras.models.Sequential()
@@ -2277,7 +2196,7 @@ model.fit(x_train, y_train,
 
 ### tf.fill
 
-```python
+​```python
 tf.fill(
     dims,
     value,
@@ -2474,7 +2393,7 @@ model.fit(x_train, y_train, batch_size=64, validation_split=0.2, epochs=1, steps
 
 这个类定义了添加Ops来训练模型的API。您从不直接使用这个类，而是实例化它的一个子类
 
-```python
+​```python
 # Create an optimizer with the desired parameters.
 opt = tf.keras.optimizers.SGD(learning_rate=0.1)
 # `loss` is a callable that takes no argument and returns the value
@@ -3917,12 +3836,8 @@ list(d.as_numpy_iterator())
 
 
 
-<<<<<<< HEAD
-#### interleave
-=======
-#### interleave方法
->>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
+#### interleave
 ```python
 interleave(
     map_func,
@@ -3934,11 +3849,9 @@ interleave(
 
 将map_func映射到此数据集，并将结果交织在一起。
 
-<<<<<<< HEAD
-**首先该方法会从该Dataset中取出cycle_length个element，然后对这些elements apply map_func, 得到cycle_length个新的Dataset对象。然后从这些新生成的Dataset对象中取数据，每个Dataset对象一次取block_length个数据。当新生成的某个Dataset的对象取尽时，从原Dataset中再取一个element，然后apply map_func，以此类推。**
-=======
 **首先该方法会从该Dataset中取出cycle_length个element，然后对这些element apply map_func, 得到cycle_length个新的Dataset对象。然后从这些新生成的Dataset对象中取数据，每个Dataset对象一次取block_length个数据。当新生成的某个Dataset的对象取尽时，从原Dataset中再取一个element，然后apply map_func，以此类推。**
->>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
+
+
 
 
 
@@ -3958,11 +3871,6 @@ list(dataset.as_numpy_iterator())
 #### batch
 
 将此数据集续元素组合成批
-=======
-#### batch方法
-
-将此数据集的连续元素组合成批
->>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
 结果元素的组件将有一个额外的外部维度，即Batch_Size
 

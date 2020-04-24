@@ -441,5 +441,292 @@ get_yaml_load_all(yaml_path)
 
 
 
+## 7、Queue
 
+在Python文档中搜索队列（queue）会发现，Python标准库中包含了四种队列，分别是
+
+`queue.Queue` / `asyncio.Queue` / `multiprocessing.Queue` / `collections.deque`。
+
+
+
+### collections.deque
+
+deque是双端队列（double-ended queue）的缩写，由于两端都能编辑，既可以用来实现栈（stack）也可以用来实现队列（queue）。
+
+collections.deque是一个可以方便实现队列的数据结构，具有线程安全的特性，并且有很高的性能。
+
+
+
+### queue.Queue & asyncio.Queue
+
+`queue.Queue`和`asyncio.Queue`都是支持多生产者、多消费者的队列，基于collections.deque，他们都提供了Queue（FIFO队列）、PriorityQueue（优先级队列）、LifoQueue（LIFO队列），接口方面也相同。
+
+区别在于queue.Queue适用于多线程的场景，asyncio.Queue适用于协程场景下的通信，由于asyncio的加成，queue.Queue下的阻塞接口在asyncio.Queue中则是以返回协程对象的方式执行
+
+
+
+### multiprocessing.Queue
+
+multiprocessing提供了三种队列，分别是`Queue`、`SimpleQueue`、`JoinableQueue`。
+
+multiprocessing.Queue既是线程安全也是进程安全的，相当于queue.Queue的多进程克隆版。和threading.Queue很像，multiprocessing.Queue支持put和get操作，底层结构是multiprocessing.Pipe
+
+
+
+## 8、comtypes
+
+
+
+## 9、lxml
+
+常见的 XML 编程接口有 DOM 和 SAX，这两种接口处理 XML 文件的方式不同，当然使用场合也不同。
+
+Python 有三种方法解析 XML，SAX，DOM，以及 ElementTree:
+
+1.**SAX** (simple API for XML )
+Python 标准库包含 SAX 解析器，SAX 用事件驱动模型，通过在解析XML的过程中触发一个个的事件并调用用户定义的回调函数来处理XML文件。
+
+2.**DOM**(Document Object Model)
+将 XML 数据在内存中解析成一个树，通过对树的操作来操作XML
+
+3.**ElementTree**(元素树)
+ElementTree就像一个轻量级的DOM，具有方便友好的API。代码可用性好，速度快，消耗内存少。
+
+
+
+**Element对象**
+tag:string      元素代表的数据种类。
+text:string     元素的内容。
+tail:string      元素的尾形。
+attrib:dictionary     元素的属性字典。
+
+**针对属性的操作**
+clear()          清空元素的后代、属性、text和tail也设置为None。
+get(key, default=None)     获取key对应的属性值，如该属性不存在则返回default值。
+items()         根据属性字典返回一个列表，列表元素为(key, value）。
+keys()           返回包含所有元素属性键的列表。
+set(key, value)     设置新的属性键与值。
+
+
+
+**针对后代的操作**
+append(subelement)     添加直系子元素。
+
+extend(subelements)    增加一串元素对象作为子元素。
+
+find(match)             寻找第一个匹配子元素，匹配对象可以为tag或path。
+
+findall(match)          寻找所有匹配子元素，匹配对象可以为tag或path。
+
+findtext(match)         寻找第一个匹配子元素，返回其text值。匹配对象可以为tag或path。
+
+insert(index, element)  在指定位置插入子元素。
+
+iter(tag=None)           生成遍历当前元素所有后代或者给定tag的后代的迭代器。
+
+iterfind(match)          根据tag或path查找所有的后代。
+
+itertext()               遍历所有后代并返回text值。
+
+remove(subelement)      删除子元素。
+
+
+
+## 10、xpath
+
+**XPath 是一门在 XML 文档中查找信息的语言。XPath 用于在 XML 文档中通过元素和属性进行导航。**
+
+- XPath 使用路径表达式在 XML 文档中进行导航
+- XPath 包含一个标准函数库
+- XPath 是 XSLT 中的主要元素
+- XPath 是一个 W3C 标准
+
+XPath 使用路径表达式来选取 XML 文档中的节点或者节点集。这些路径表达式和我们在常规的电脑文件系统中看到的表达式非常相似。
+
+XPath 含有超过 100 个内建的函数。这些函数用于字符串值、数值、日期和时间比较、节点和 QName 处理、序列处理、逻辑值等等。
+
+
+
+### 节点
+
+**在 XPath 中，有七种类型的节点：元素、属性、文本、命名空间、处理指令、注释以及文档节点（或称为根节点）。**
+
+```xml
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<bookstore>
+
+<book>
+  <title lang="en">Harry Potter</title>
+  <author>J K. Rowling</author> 
+  <year>2005</year>
+  <price>29.99</price>
+</book>
+
+</bookstore>
+```
+
+```
+<bookstore> （文档节点）
+<author>J K. Rowling</author> （元素节点）
+lang="en" （属性节点）
+```
+
+
+
+**节点关系**：**父**（Parent）、**子**（Children）、**同胞**（Sibling）、**先辈**（Ancestor）、**后代**（Descendant）
+
+
+
+### 语法
+
+**XPath 使用路径表达式来选取 XML 文档中的节点或节点集。节点是通过沿着路径 (path) 或者步 (steps) 来选取的。**
+
+| nodename | 选取此节点的所有子节点。                                   |
+| -------- | ---------------------------------------------------------- |
+| /        | 从根节点选取。                                             |
+| //       | 从匹配选择的当前节点选择文档中的节点，而不考虑它们的位置。 |
+| .        | 选取当前节点。                                             |
+| ..       | 选取当前节点的父节点。                                     |
+| @        | 选取属性。                                                 |
+
+| 通配符 | 描述                 |
+| :----- | :------------------- |
+| *      | 匹配任何元素节点。   |
+| @*     | 匹配任何属性节点。   |
+| node() | 匹配任何类型的节点。 |
+
+通过在路径表达式中使用“|”运算符，您可以选取**若干个路径**。
+
+| 路径表达式                       | 结果                                                         |
+| :------------------------------- | :----------------------------------------------------------- |
+| //book/title \| //book/price     | 选取 book 元素的所有 title 和 price 元素。                   |
+| //title \| //price               | 选取文档中的所有 title 和 price 元素。                       |
+| /bookstore/book/title \| //price | 选取属于 bookstore 元素的 book 元素的所有 title 元素，以及文档中所有的 price 元素。 |
+
+**谓语**用来查找某个特定的节点或者包含某个指定的值的节点。
+
+| 路径表达式                         | 结果                                                         |
+| :--------------------------------- | :----------------------------------------------------------- |
+| /bookstore/book[1]                 | 选取属于 bookstore 子元素的第一个 book 元素。                |
+| /bookstore/book[last()]            | 选取属于 bookstore 子元素的最后一个 book 元素。              |
+| /bookstore/book[last()-1]          | 选取属于 bookstore 子元素的倒数第二个 book 元素。            |
+| /bookstore/book[position()<3]      | 选取最前面的两个属于 bookstore 元素的子元素的 book 元素。    |
+| //title[@lang]                     | 选取所有拥有名为 lang 的属性的 title 元素。                  |
+| //title[@lang='eng']               | 选取所有 title 元素，且这些元素拥有值为 eng 的 lang 属性。   |
+| /bookstore/book[price>35.00]       | 选取 bookstore 元素的所有 book 元素，且其中的 price 元素的值须大于 35.00。 |
+| /bookstore/book[price>35.00]/title | 选取 bookstore 元素中的 book 元素的所有 title 元素，且其中的 price 元素的值须大于 35.00。 |
+
+
+
+## 11、print倒计时
+
+> **print**(value,sep=' ',end='\n',file=sys.stdout,flush=False)
+
+- **value** : 要打印的字符串
+
+- **sep** : 则是value之间的间隔
+
+- **end** : 是打印完成之后要打印的东西
+
+- **file** ：打印到哪里
+
+- **flush** ：是否开启缓冲区
+
+```python
+import time
+for x in range(5, -1, -1):
+    mystr = "倒计时" + str(x) + "秒"
+    print(mystr, end="")
+    print("\b" * (len(mystr)*2), end="", flush=True)
+    time.sleep(1)
+```
+
+
+
+## 12、格式化输出
+
+### %用法
+
+#### 1、整数的输出
+
+%o —— oct 八进制
+%d —— dec 十进制
+%x —— hex 十六进制
+
+```python
+1 >>> print('%o' % 20)
+2 24
+3 >>> print('%d' % 20)
+4 20
+5 >>> print('%x' % 20)
+6 14
+```
+
+#### 2、浮点数输出
+
+%f ——保留小数点后面六位有效数字
+　　%.3f，保留3位小数位
+%e ——保留小数点后面六位有效数字，指数形式输出
+　　%.3e，保留3位小数位，使用科学计数法
+%g ——在保证六位有效数字的前提下，使用小数方式，否则使用科学计数法
+　　%.3g，保留3位有效数字，使用小数或科学计数法
+
+```python
+ 1 >>> print('%f' % 1.11)  # 默认保留6位小数
+ 2 1.110000
+ 3 >>> print('%.1f' % 1.11)  # 取1位小数
+ 4 1.1
+ 5 >>> print('%e' % 1.11)  # 默认6位小数，用科学计数法
+ 6 1.110000e+00
+ 7 >>> print('%.3e' % 1.11)  # 取3位小数，用科学计数法
+ 8 1.110e+00
+ 9 >>> print('%g' % 1111.1111)  # 默认6位有效数字
+10 1111.11
+11 >>> print('%.7g' % 1111.1111)  # 取7位有效数字
+12 1111.111
+13 >>> print('%.2g' % 1111.1111)  # 取2位有效数字，自动转换为科学计数法
+14 1.1e+03
+```
+
+#### 3、字符串输出
+
+%s
+%10s——右对齐，占位符10位
+%-10s——左对齐，占位符10位
+%.2s——截取2位字符串
+%10.2s——10位占位符，截取两位字符串
+
+```python
+ 1 >>> print('%s' % 'hello world')  # 字符串输出
+ 2 hello world
+ 3 >>> print('%20s' % 'hello world')  # 右对齐，取20位，不够则补位
+ 4          hello world
+ 5 >>> print('%-20s' % 'hello world')  # 左对齐，取20位，不够则补位
+ 6 hello world         
+ 7 >>> print('%.2s' % 'hello world')  # 取2位
+ 8 he
+ 9 >>> print('%10.2s' % 'hello world')  # 右对齐，取2位
+10         he
+11 >>> print('%-10.2s' % 'hello world')  # 左对齐，取2位
+12 he    
+```
+
+
+
+### format的用法
+
+```python
+salary = 9999.99
+print(f'My salary is {salary:10.3f}')
+My salary is   9999.990
+
+s = 3
+print(f"{s:05d}")
+00003
+
+s = 3
+print(f"{s:06.3f}")
+03.000
+```
 
