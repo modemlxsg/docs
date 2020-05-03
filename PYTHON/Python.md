@@ -441,6 +441,12 @@ get_yaml_load_all(yaml_path)
 
 
 
+
+
+
+
+
+
 ## 7、Queue
 
 在Python文档中搜索队列（queue）会发现，Python标准库中包含了四种队列，分别是
@@ -729,4 +735,25 @@ s = 3
 print(f"{s:06.3f}")
 03.000
 ```
+
+
+
+## 13、.gitignore
+
+常用的规则：
+
+```python
+1）/mtk/             过滤整个文件夹
+2）*.zip             过滤所有.zip文件
+3）/mtk/do.c         过滤某个具体文件
+```
+
+gitignore还可以指定要将哪些文件添加到版本管理中:
+
+```python
+1）!*.zip
+2）!/mtk/one.txt
+```
+
+唯一的区别就是规则开头多了一个感叹号
 

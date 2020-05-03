@@ -153,6 +153,26 @@ plt.show()
 
 
 
+## HSV颜色分割
+
+HSV 表示 hue（色相）、saturation（饱和度）、value（亮度）
+
+![image-20200428121506393](images\OpenCV.assets\image-20200428121506393.png)
+
+```python
+hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
+# 提取指定范围颜色，保留指定范围颜色, 其余置为黑(0)
+lower_hsv = np.array([0, 43, 46])  # hsv中h，s，v的最小值
+upper_hsv = np.array([50, 255, 255])  # hsv中的h，s，v最大值
+mask = cv.inRange(hsv, lowerb=lower_hsv, upperb=upper_hsv)
+```
+
+
+
+
+
+
+
 # API
 
 | 主要模块（Main Modules） | 描述                   |
@@ -706,7 +726,21 @@ Draws a text string.
 
 
 
+## highgui
 
+### createTrackbar 
+
+> int 	cv::**createTrackbar** (const String &trackbarname, const String &winname, int *value, int count, TrackbarCallback onChange=0, void *userdata=0)
+>
+
+|              |                                                              |
+| ------------ | ------------------------------------------------------------ |
+| trackbarname | Name of the created trackbar.                                |
+| winname      | Name of the window that will be used as a parent of the created trackbar. |
+| value        | Optional pointer to an integer variable whose value reflects the position of the slider. Upon creation, the slider position is defined by this variable. |
+| count        | Maximal position of the slider. The minimal position is always 0. |
+| onChange     | Pointer to the function to be called every time the slider changes position. This function should be prototyped as void Foo(int,void*); , where the first parameter is the trackbar position and the second parameter is the user data (see the next parameter). If the callback is the NULL pointer, no callbacks are called, but only value is updated. |
+| userdata     | User data that is passed as is to the callback. It can be used to handle trackbar events without using global variables. |
 
 
 

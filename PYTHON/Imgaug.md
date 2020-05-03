@@ -1193,6 +1193,8 @@ This augmenter is identical to [`PadToAspectRatio`](https://imgaug.readthedocs.i
 
 ## imgaug.augmenters.color
 
+影响图像颜色或图像色彩空间的增强器
+
 - [`InColorspace`](https://imgaug.readthedocs.io/en/latest/source/api_augmenters_color.html#imgaug.augmenters.color.InColorspace) (deprecated)
 - [`WithColorspace`](https://imgaug.readthedocs.io/en/latest/source/api_augmenters_color.html#imgaug.augmenters.color.WithColorspace)
 - [`WithBrightnessChannels`](https://imgaug.readthedocs.io/en/latest/source/api_augmenters_color.html#imgaug.augmenters.color.WithBrightnessChannels)
@@ -1243,23 +1245,186 @@ Parameters:
 
 
 
+## imgaug.augmenters.blend
+
+将两个图像彼此融合的增强器
 
 
 
+## imgaug.augmenters.blur
+
+使图像模糊的增强器
+
+- [`GaussianBlur`](https://imgaug.readthedocs.io/en/latest/source/api_augmenters_blur.html#imgaug.augmenters.blur.GaussianBlur)
+- [`AverageBlur`](https://imgaug.readthedocs.io/en/latest/source/api_augmenters_blur.html#imgaug.augmenters.blur.AverageBlur)
+- [`MedianBlur`](https://imgaug.readthedocs.io/en/latest/source/api_augmenters_blur.html#imgaug.augmenters.blur.MedianBlur)
+- [`BilateralBlur`](https://imgaug.readthedocs.io/en/latest/source/api_augmenters_blur.html#imgaug.augmenters.blur.BilateralBlur)
+- [`MotionBlur`](https://imgaug.readthedocs.io/en/latest/source/api_augmenters_blur.html#imgaug.augmenters.blur.MotionBlur)
+- [`MeanShiftBlur`](https://imgaug.readthedocs.io/en/latest/source/api_augmenters_blur.html#imgaug.augmenters.blur.MeanShiftBlur)
 
 
 
+## imgaug.augmenters.collections
+
+其他增强器的集合
 
 
 
+## imgaug.augmenters.contrast
+
+执行对比度变化的增强器
 
 
 
+## imgaug.augmenters.convolutional
+
+基于将卷积核应用于图像的增强器
 
 
 
+## imgaug.augmenters.flip
+
+将镜像/翻转操作应用于图像的增强器。
+
+- [`Fliplr`](https://imgaug.readthedocs.io/en/latest/source/api_augmenters_flip.html#imgaug.augmenters.flip.Fliplr)
+- [`Flipud`](https://imgaug.readthedocs.io/en/latest/source/api_augmenters_flip.html#imgaug.augmenters.flip.Flipud)
 
 
 
+## imgaug.augmenters.geometric
 
+应用仿射或类似变换的增强器
+
+- [`Affine`](https://imgaug.readthedocs.io/en/latest/source/api_augmenters_geometric.html#imgaug.augmenters.geometric.Affine)
+- [`ScaleX`](https://imgaug.readthedocs.io/en/latest/source/api_augmenters_geometric.html#imgaug.augmenters.geometric.ScaleX)
+- [`ScaleY`](https://imgaug.readthedocs.io/en/latest/source/api_augmenters_geometric.html#imgaug.augmenters.geometric.ScaleY)
+- [`TranslateX`](https://imgaug.readthedocs.io/en/latest/source/api_augmenters_geometric.html#imgaug.augmenters.geometric.TranslateX)
+- [`TranslateY`](https://imgaug.readthedocs.io/en/latest/source/api_augmenters_geometric.html#imgaug.augmenters.geometric.TranslateY)
+- [`Rotate`](https://imgaug.readthedocs.io/en/latest/source/api_augmenters_geometric.html#imgaug.augmenters.geometric.Rotate)
+- [`ShearX`](https://imgaug.readthedocs.io/en/latest/source/api_augmenters_geometric.html#imgaug.augmenters.geometric.ShearX)
+- [`ShearY`](https://imgaug.readthedocs.io/en/latest/source/api_augmenters_geometric.html#imgaug.augmenters.geometric.ShearY)
+- [`AffineCv2`](https://imgaug.readthedocs.io/en/latest/source/api_augmenters_geometric.html#imgaug.augmenters.geometric.AffineCv2)
+- [`PiecewiseAffine`](https://imgaug.readthedocs.io/en/latest/source/api_augmenters_geometric.html#imgaug.augmenters.geometric.PiecewiseAffine)
+- [`PerspectiveTransform`](https://imgaug.readthedocs.io/en/latest/source/api_augmenters_geometric.html#imgaug.augmenters.geometric.PerspectiveTransform)
+- [`ElasticTransformation`](https://imgaug.readthedocs.io/en/latest/source/api_augmenters_geometric.html#imgaug.augmenters.geometric.ElasticTransformation)
+- [`Rot90`](https://imgaug.readthedocs.io/en/latest/source/api_augmenters_geometric.html#imgaug.augmenters.geometric.Rot90)
+- [`WithPolarWarping`](https://imgaug.readthedocs.io/en/latest/source/api_augmenters_geometric.html#imgaug.augmenters.geometric.WithPolarWarping)
+- [`Jigsaw`](https://imgaug.readthedocs.io/en/latest/source/api_augmenters_geometric.html#imgaug.augmenters.geometric.Jigsaw)
+
+
+
+### Affine
+
+> class imgaug.augmenters.geometric.**Affine**(scale=None, translate_percent=None, translate_px=None, rotate=None, shear=None, order=1, cval=0, mode='constant', fit_output=False, backend='auto', seed=None, name=None, random_state='deprecated', deterministic='deprecated')
+
+增强器将仿射变换应用于图像，这主要是OpenCV和skimage中相应类和函数的包装。
+
+仿射转换涉及：
+
+- Translation (“move” image on the x-/y-axis) 平移
+- Rotation 选择
+- Scaling (“zoom” in/out) 缩放
+- Shear (move one side of the image, turning a square into a trapezoid) 裁剪
+
+所有这些变换都可以在图像中创建“新”像素，而没有定义内容，例如 如果将图像向左平移，则会在右侧创建像素。 必须定义一种方法来处理这些像素值。 此类的参数`cval`和`mode`对此进行了处理。
+
+一些转换涉及在输入图像的几个像素之间进行插值以生成输出像素值。参数`order` 涉及用于此的插值方法。
+
+尽管此增强器支持与相应图像大小不同的分段图和热图，但强烈建议使用相同的纵横比。 例如。 对于形状为（200，100，3）的图像，良好的segmap / heatmap阵列形状也应遵循2：1的比例，理想情况下为（200，100，C），（100，50，C）或（50，25， C）。 否则，涉及旋转或剪切的转换将产生未对齐的输出。 出于性能原因，没有明确验证长宽比是否相似。
+
+
+
+**Parameters:**
+
+- **scale** (number or tuple of number or list of number or imgaug.parameters.StochasticParameter or dict {“x”: number/tuple/list/StochasticParameter, “y”: number/tuple/list/StochasticParameter}, optional)
+
+  要使用的比例因子，其中1.0表示“无变化”，而0.5则缩小到原始大小的50％。
+
+  - 如果为单个数字，则该值将用于所有图像。
+  - 如果是元组（a，b），则将从[a，b]间隔为每个图像统一采样一个值。该值将同时用于x轴和y轴。
+  - 如果是列表，则将从每个图像的列表中采样一个随机值（再次用于x轴和y轴）。
+  - 如果是StochasticParameter，则将从该参数中为每个图像采样一个值（再次用于x和y轴）。
+  - 如果是字典，则期望具有键x和/或y。 这些键中的每个键都可以具有如上所述的相同值。 使用字典可以为两个轴设置不同的值，然后每个轴将独立进行采样，从而导致两个轴之间的采样不同。
+
+- **translate_percent** (None or number or tuple of number or list of number or imgaug.parameters.StochasticParameter or dict {“x”: number/tuple/list/StochasticParameter, “y”: number/tuple/list/StochasticParameter}, optional)
+
+  平移是图像高度/宽度的一部分（x平移，y平移），其中0表示“无变化”，而0.5表示“轴尺寸的一半”。
+
+  - 如果为None，则等效于0.0，除非translate_px具有非None的值。
+  - 如果为单个数字，则该值将用于所有图像。
+  - 如果是元组（a，b），则将从[a，b]间隔为每个图像统一采样一个值。该采样的分数值将在x轴和y轴上相同使用
+  - 如果是列表，则将从每个图像的列表中采样一个随机值（再次用于x轴和y轴）
+  - 如果是StochasticParameter，则将从该参数中为每个图像采样一个值（再次用于x和y轴）。
+  - 如果是字典，则期望具有键x和/或y。 这些键中的每个键都可以具有如上所述的相同值。 使用字典可以为两个轴设置不同的值，然后每个轴将独立进行采样，从而导致两个轴之间的采样不同。
+
+- **translate_px** 以像素为单位的平移，取值同上
+
+- **rotate** 旋转度数（非弧度），即期望值范围约为[-360，360]。旋转发生在图像中心附近，而不是其他某些框架中的左上角。
+
+- **shear** 剪切度（非弧度），即期望值范围在[-360，360]左右，合理值在[-45，45]范围内。
+
+- **order**  (*int or iterable of int or imgaug.ALL or imgaug.parameters.StochasticParameter, optional*)
+
+  - `0` -> `cv2.INTER_NEAREST`
+  - `1` -> `cv2.INTER_LINEAR`
+  - `2` -> `cv2.INTER_CUBIC`
+  - `3` -> `cv2.INTER_CUBIC`
+  - `4` -> `cv2.INTER_CUBIC`
+
+- **cval** 填充新创建的像素时要使用的常数值。 （例如，向右平移1px将在图像左侧创建一个新的1px宽的像素列）。 该值仅在mode = constant时使用。 uint8图像的期望值范围是[0，255]。 它可能是一个浮点值。
+
+- **mode** 填充新创建的像素时使用的方法。与skimage（和numpy.pad（））中的含义相同：
+
+  - `constant` -> `cv2.BORDER_CONSTANT`
+  - `edge` -> `cv2.BORDER_REPLICATE`
+  - `symmetric` -> `cv2.BORDER_REFLECT`
+  - `reflect` -> `cv2.BORDER_REFLECT_101`
+  - `wrap` -> `cv2.BORDER_WRAP`
+
+- **fit_output** 是否修改仿射变换以使整个输出图像始终包含在像平面中（True），还是接受部分图像不在像平面中（False）。 可以认为这是先应用仿射变换，然后再应用第二个变换在新图像上“放大”，以使其适合图像平面，这对于避免图像的角在图像平面后超出图像平面非常有用。 应用旋转。 但是，它将否定转换和缩放。 还要注意，激活此选项可能导致图像尺寸与输入图像尺寸不同。 为了避免这种情况，请将Affine包装在KeepSizeByResize中，例如`KeepSizeByResize(Affine(...))`.
+
+- **backend** 用作后端的框架。 有效值为auto，skimage（scikit图像的扭曲）和cv2（OpenCV的扭曲）。 如果使用auto，则扩充器将在可能的情况下自动尝试使用cv2（顺序必须为[0，1，3]）。 如果cv2不支持order / dtype，它将默默地退回到skimage。 cv2通常比skimage更快。 它还支持RGB cval，而skimage将求助于强度cval（即与RGB相同的值的3倍）。 如果选择了cv2，并且阶数为2或4，它将自动退回到阶数3。
+
+
+
+**Examples**
+
+```python
+>>> import imgaug.augmenters as iaa
+>>> aug = iaa.Affine(scale=2.0)
+>>> aug = iaa.Affine(translate_px=16)
+>>> aug = iaa.Affine(translate_percent=0.1)
+>>> aug = iaa.Affine(rotate=35)
+>>> aug = iaa.Affine(shear=15)
+>>> aug = iaa.Affine(translate_px=(-16, 16))
+>>> aug = iaa.Affine(translate_px={"x": (-16, 16), "y": (-4, 4)})
+>>> aug = iaa.Affine(scale=2.0, order=[0, 1])
+>>> aug = iaa.Affine(translate_px=16, cval=(0, 255))
+>>> aug = iaa.Affine(translate_px=16, mode=["constant", "edge"])
+>>> aug = iaa.Affine(shear={"y": (-45, 45)})
+```
+
+
+
+### PiecewiseAffine
+
+> class imgaug.augmenters.geometric.**PiecewiseAffine**(scale=(0.0, 0.04), nb_rows=(2, 4), nb_cols=(2, 4), order=1, cval=0, mode='constant', absolute_scale=False, polygon_recoverer=None, seed=None, name=None, random_state='deprecated', deterministic='deprecated')
+
+应用局部之间不同的仿射变换
+
+该扩充器在图像上放置点的规则网格，并通过仿射变换在这些点的附近随机移动。这导致局部失真。
+
+这主要是scikit-image的PiecewiseAffine的包装。另请参阅仿射以了解类似技术。
+
+
+
+### PerspectiveTransform
+
+> classimgaug.augmenters.geometric.**PerspectiveTransform**(scale=(0.0, 0.06), cval=0, mode='constant', keep_size=True, fit_output=False, polygon_recoverer='auto', seed=None, name=None, random_state='deprecated', deterministic='deprecated')
+
+将随机四点透视变换应用于图像。
+
+四个点中的每个点都使用距其相应角点的随机距离放置在图像上。 该距离是从正态分布中采样的。 因此，大多数变换不会对图像产生太大的影响，而有些“聚焦”在图像内部的多边形上。
+
+这种增强器的结果与Crop有一些相似之处
 

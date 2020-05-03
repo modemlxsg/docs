@@ -1577,20 +1577,10 @@ resnet50_new = keras.models.Sequential([
 
 
 
-<<<<<<< HEAD
+
 ### 08、分布式训练
 
 ### 09、模型保存与部署
-=======
-
-
-## 07、循环网络
-
-## 08、分布式训练
-
-## 09、模型保存与部署
->>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
-
 ![image-20200201162847217](images/TensorFlow2.x.assets/image-20200201162847217.png)
 
 
@@ -2216,161 +2206,25 @@ array([[9, 9, 9],
 
 
 
-## tf.nn
 
-***
 
-### ctc_loss
 
-```python
-tf.nn.ctc_loss(
-    labels,
-    logits,
-    label_length,
-    logit_length,
-    logits_time_major=True,
-    unique=None,
-    blank_index=None,
-    name=None
-)
-```
 
-**Notes:**
 
-1、标签可以是密集的、零填充的张量，带有标签序列长度的矢量，也可以作为SparseTensor。
 
-2、在TPU和GPU上：只支持密集的填充标签。
 
-3、在CPU上：调用者可以使用SparseTensor或稠密的填充标签，但是使用SparseTenser调用将大大加快速度。
 
 
 
-**Args:**
 
-- **`labels`**: tensor of shape **[batch_size, max_label_seq_length]** or SparseTensor
-- **`logits`**: tensor of shape **[frames, batch_size, num_labels]**, if logits_time_major == False, shape is [batch_size, frames, num_labels].
-- **`label_length`**: tensor of shape **[batch_size]** `None if labels is SparseTensor` Length of reference label sequence in labels.
-- **`logit_length`**: tensor of shape **[batch_size]** Length of input sequence in logits.
-- **`logits_time_major`**: (optional) If True (default), logits is shaped [time, batch, logits]. If False, shape is [batch, time, logits]
-- **`unique`**: (optional) Unique label indices as computed by ctc_unique_labels(labels). If supplied, enable a faster, memory efficient implementation on TPU.
-- **`blank_index`**: (optional) Set the class index to use for the blank label. Negative values will start from num_classes, ie, -1 will reproduce the ctc_loss behavior of using **num_classes - 1** for the blank symbol. There is some memory/performance overhead to switching from the default of 0 as an additional shifted copy of the logits may be created.
-- **`name`**: A name for this `Op`. Defaults to "ctc_loss_dense".
 
 
 
-**Returns:**
 
-- **`loss`**: tensor of shape **[batch_size]**, negative log probabilities.
 
 
 
-###  ctc_greedy_decoder
 
-```python
-tf.nn.ctc_greedy_decoder(
-    inputs,
-    sequence_length,
-    merge_repeated=True
-)
-```
-
-如果`merge_repeated`为真，则`ABB_B_B`合并为`ABBB`。如果为假则为`ABBBB`
-
-**Args:**
-
-- **`inputs`**: 3-D `float` `Tensor` sized `[max_time, batch_size, num_classes]`. The logits.
-- **`sequence_length`**: 1-D `int32` vector containing sequence lengths, having size `[batch_size]`.
-- **`merge_repeated`**: Boolean. Default: True.
-
-
-
-**Returns:**
-
-A tuple `(decoded, neg_sum_logits)` where
-
-- **`decoded`**: A single-element list. `decoded[0]` is an `SparseTensor` containing the decoded outputs.
-
-  `decoded.indices`: Indices matrix `(total_decoded_outputs, 2)`. The rows store: `[batch, time]`.
-
-  `decoded.values`: Values vector, size `(total_decoded_outputs)`. The vector stores the decoded classes.
-
-  `decoded.dense_shape`: Shape vector, size `(2)`. The shape values are: `[batch_size, max_decoded_length]`
-
-- **`neg_sum_logits`**: A `float` matrix `(batch_size x 1)` containing, for the sequence found, the negative of the sum of the greatest logit at each timeframe.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-## tf.keras
-
-***
-
-### metrics
-
-
-
-#### Metric
-
-|                  |                                                              |
-| ---------------- | ------------------------------------------------------------ |
-| **add_weight**   | 添加状态变量。仅供子类使用。                                 |
-| **reset_states** | 重置所有度量状态变量。当在训练期间对度量进行评估时，将在各epochs/steps之间调用此函数。 |
-| **result**       | 计算并返回度量值张量。                                       |
-| **update_state** | 为度量积累统计信息。                                         |
-| **init**         |                                                              |
-
-```python
-model = tf.keras.Sequential()
-model.add(tf.keras.layers.Dense(64, activation='relu'))
-model.add(tf.keras.layers.Dense(64, activation='relu'))
-model.add(tf.keras.layers.Dense(10, activation='softmax'))
-
-model.compile(optimizer=tf.keras.optimizers.RMSprop(0.01),
-              loss=tf.keras.losses.CategoricalCrossentropy(),
-              metrics=[tf.keras.metrics.CategoricalAccuracy()])
-
-data = np.random.random((1000, 32))
-labels = np.random.random((1000, 10))
-
-dataset = tf.data.Dataset.from_tensor_slices((data, labels))
-dataset = dataset.batch(32)
-
-model.fit(dataset, epochs=10)
-```
-
-
-
-#### Mean
-
-计算给定值的(加权)平均值。
-
-这个度量创建了两个变量，总数`total`和计数`count`，用于计算值的平均值。这个平均值最终作为平均值返回，这是一个幂等运算，它简单地将总数除以计数。
-
-```python
-m = tf.keras.metrics.Mean() 
-_ = m.update_state([1, 3, 5, 7]) 
-m.result().numpy() 
-
-m.reset_states() 
-_ = m.update_state([1, 3, 5, 7], sample_weight=[1, 1, 0, 0]) 
-m.result().numpy() 
->>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
-```
-
-
-
-<<<<<<< HEAD
 ###### 自动区分验证保留集
 
 在您看到的第一个端到端示例中，我们使用`validation_data`参数将Numpy数组的元组传递`(x_val, y_val)`给模型，以在每个时期结束时评估验证损失和验证指标。
@@ -2410,7 +2264,7 @@ opt.minimize(loss, var_list=[var1, var2])
 
 
 
-<<<<<<< HEAD
+
 ##### 来自tf.data数据集的培训和评估
 
 在过去的几段中，您已经了解了如何处理损失，指标和优化器，并且已经了解了如何在将数据作为Numpy数组传递时使用`validation_data`和`validation_split`中的和参数`fit`。现在让我们看一下您的数据以tf.data数据集形式出现的情况。
@@ -3326,14 +3180,6 @@ self.total = self.add_weight(name='total', dtype=tf.int32,initializer=tf.zeros_i
 
 
 
-
-
-
-
-
-
-
-
 #### Mean
 
 计算给定值的(加权)平均值。
@@ -3397,30 +3243,6 @@ for input, output in data:
 | -------------- | ---------------------------------- |
 | **iterations** | 变量。此优化器运行的培训步骤数     |
 | **weights**    | 根据创建的顺序返回此优化器的变量。 |
-=======
-**手动训练：**
-
-```python
-opt = tf.keras.optimizers.SGD(learning_rate=0.1)
-model = tf.keras.Sequential()
-model.add(tf.keras.layers.Dense(num_hidden, activation='relu'))
-model.add(tf.keras.layers.Dense(num_classes, activation='sigmoid'))
-
-loss_fn = lambda: tf.keras.losses.mse(model(input), output)
-var_list_fn = lambda: model.trainable_weights
-
-for input, output in data:
-  opt.minimize(loss_fn, var_list_fn)
-```
-
-
-
-| 属性           |                                    |
-| -------------- | ---------------------------------- |
-| **iterations** | 变量。此优化器运行的培训步骤数     |
-| **weights**    | 根据创建的顺序返回此优化器的变量。 |
->>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
-
 
 
 |                     |                                                              |
@@ -3469,26 +3291,13 @@ model.fit(data, labels, epochs=5)
 
 
 
-<<<<<<< HEAD
-##### ExponentialDecay
-=======
-**ExponentialDecay**
->>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
+##### ExponentialDecay
 在训练模型时，往往建议随着训练的进行而降低学习率。该计划在给定初始学习速率的情况下，将指数衰减函数应用于优化器步骤。
 
 ```python
-<<<<<<< HEAD
 tf.keras.optimizers.schedules.ExponentialDecay(
     initial_learning_rate, decay_steps, decay_rate, staircase=False, name=None
-=======
-__init__(
-    initial_learning_rate,
-    decay_steps,
-    decay_rate,
-    staircase=False,
-    name=None
->>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 )
 ```
 
@@ -3502,8 +3311,6 @@ def decayed_learning_rate(step):
 ```
 
 
-
-<<<<<<< HEAD
 Args:
 
 - **`initial_learning_rate`**: A scalar `float32` or `float64` `Tensor` or a Python number. The initial learning rate.
@@ -3764,12 +3571,6 @@ ds = tf.data.Dataset.zip((a, b))
 
 
 #### map
-=======
-
-
-#### map方法
->>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
-
 ```python
 map(
     map_func,
@@ -3901,12 +3702,8 @@ list(dataset.as_numpy_iterator())
 
 
 
-<<<<<<< HEAD
-####  padded_batch
-=======
-####  padded_batch方法
->>>>>>> b6b15513843bdc29bd1809ac3eb9babe5db83710
 
+####  padded_batch
 ```python
 padded_batch(
     batch_size,
