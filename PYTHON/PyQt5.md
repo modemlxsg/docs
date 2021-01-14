@@ -2,6 +2,30 @@
 
 `pip install PyQt5`
 
+`pip install PyQt5-tools`
+
+
+
+## vscode 环境配置
+
+安装扩展 `PYQT Integration` 并配置路径
+
+```c++
+import sys
+from PyQt5 import QtWidgets
+  
+app = QtWidgets.QApplication(sys.argv)
+widget = QtWidgets.QWidget()
+widget.resize(360, 360)
+widget.setWindowTitle("hello, pyqt5")
+widget.show()
+sys.exit(app.exec())
+```
+
+
+
+
+
 
 
 ## 对信号和槽的支持

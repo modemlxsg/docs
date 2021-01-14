@@ -1,5 +1,7 @@
 #  《The Linux Command Line》
 
+https://www.kancloud.cn/thinkphp/linux-command-line/39456
+
 ## 01、什么是shell
 
 一说到命令行，我们真正指的是 **shell**。shell 就是一个程序，它接受从键盘输入的命令， 然后把命令传递给操作系统去执行。几乎所有的 Linux 发行版都提供一个名为 bash 的 来自 GNU 项目的 shell 程序。“bash” 是 “Bourne Again SHell” 的首字母缩写， 所指的是这样一个事实，bash 是最初 Unix 上由 Steve Bourne 写成 shell 程序 sh 的增强版。
@@ -1777,3 +1779,87 @@ make: Nothing to be done for `all'.
 /usr/local/bin/diction
 [me@linuxbox diction-1.11]$ man diction
 ```
+
+
+
+
+
+# Linux
+
+## 配置开机启动脚本
+
+### systemd 和 init
+
+内核自行启动（已经被载入内存，开始运行，并已初始化所有的设备驱动程序和数据结构等）之后，就通过启动一个用户级程序init的方式，完成引导进程。所以,init始终是第一个进程（其进程编号始终为1）。
+init进程作为服务的启动进程由来已久，但是其存在启动较慢、编写复杂的问题。
+
+**Systemd** 就是为了解决这些问题而诞生的。它的设计目标是，为系统的启动和管理提供一套完整的解决方案。
+
+Systemd 并不是一个命令，而是一组命令，涉及到系统管理的方方面面，对于其命令，这里不作过多介绍。在一些比较新版本的Linux中，systemd 取代了init，其进程编号为1，故服务的启动也是通过systemd进行管理。
+可以使用systemctl --version命令查看systemd的版本。
+systemd的使用大幅提高了系统服务的运行效率, 而unit的文件位置一般主要有三个目录：
+
+`/etc/systemd/system`
+`/run/systemd/system`
+`/lib/systemd/system`
+
+这三个目录的配置文件优先级依次从高到低，如果同一选项三个地方都配置了，优先级高的会覆盖优先级低的。
+
+```shell
+[Unit]
+Description=xxxxxxxxxxxxxxxx #描述服务 
+After=network.target #用于指定服务启动的前置条件
+Documentation=  #帮助文件的地址如http://baidu.com/ ，可缺省
+
+[Service]
+# User=  启动用户  
+# Group=  启动用户组
+ExecStart=  #服务启动命令，此项必填
+# ExecStop=  服务终止命令，可缺省
+
+
+# Recommended limits for for mongod as specified in
+# http://docs.mongodb.org/manual/reference/ulimit/#recommended-settings
+
+[Install] #用来定义如何启动，以及是否开机启动。
+WantedBy=multi-user.target #当服务开机启动后，会放入什么文件夹，影响启动顺序
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

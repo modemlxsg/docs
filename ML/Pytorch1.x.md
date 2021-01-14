@@ -947,19 +947,21 @@ The Connectionist Temporal Classification loss.
 
 Shape:
 
-- **Log_probs**: Tensor of size$ (T, N, C)$, where $T = \text{input length}$ , $N = \text{batch size}$  , and $C = \text{number of classes (including blank)}$ . The logarithmized probabilities of the outputs e.g. obtained with `torch.nn.functional.log_softmax()`
+- **Log_probs**: Tensor of size$ (T, N, C)$, where $T = \text{input length}$ , $N = \text{batch size}$  , and $C = \text{number of classes (including blank)}$ . shape为(T, N, C)的模型输出张量，其中，T表示CTCLoss的输入长度也即输出序列长度，N表示训练的batch size长度，C则表示包含有空白标签的所有要预测的字符集总长度，log_probs一般需要经过torch.nn.functional.log_softmax处理后再送入到CTCLoss中；
 
 - **Targets**: 大小为$（N，S）$或$（\operatorname {sum}（\text {target_lengths}））$ 的张量，
 
-  其中$ N = \text{batch_size} $ 和 $ S = \text {最大目标长度}$ ，如果shape为$（N，S）$。 它代表目标序列。 目标序列中的每个元素都是一个类索引。 并且目标索引不能为空（默认= 0）。 在（N，S）形式中，将目标填充到最长序列的长度并进行堆叠。 在$（\operatorname {sum}（\text {target_lengths}））$格式中，假定目标未填充并且在1维内串联。
+  shape为(N, S) 或(sum(target_lengths))的张量，其中第一种类型，N表示训练的batch size长度，S则为标签长度，第二种类型，则为所有标签长度之和，但是需要注意的是targets不能包含有空白标签；
 
 - **Input_lengths**: Tuple or tensor of size $(N)$ , 
 
-  $N = \text{batch size}$ . 它代表输入的长度（每个必须为$ \leq T $）。 并且在序列被填充为相等长度的假设下，为每个序列指定长度以实现屏蔽。
+  shape为(N)的张量或元组，但每一个元素的长度必须等于T即输出序列长度，一般来说模型输出序列固定后则该张量或元组的元素值均相同；
 
 - **Target_lengths**: Tuple or tensor of size $(N)$, where $N = \text{batch size}$  . 
 
   代表目标的长度。 在将序列填充为相等长度的假设下，为每个序列指定长度以实现屏蔽。如果目标形状为$（N,S）$，则target_lengths实际上是每个目标序列的停止索引$ S_n $，这样批次中每个目标的 $target_n =targets[n，0：s_n]$ 。 长度必须分别为$\leq S$。如果目标是作为单个目标的并置的1d张量给出的，则target_lengths必须加起来为张量的总长度。
+
+  shape为(N)的张量或元组，其每一个元素指示每个训练输入序列的标签长度，但标签长度是可以变化的；
 
 - **Output**: scalar. If `reduction` is `'none'`, then $(N)$, where $N = \text{batch size}$ 
 
